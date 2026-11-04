@@ -1,6 +1,6 @@
 import { provideNgramModel } from '../engine/workerClient';
 
-const MODEL_URL = '/assets/ngram-v1.bin';
+const MODEL_URL = '/assets/ngram-v2.bin';
 
 let pending: Promise<boolean> | null = null;
 

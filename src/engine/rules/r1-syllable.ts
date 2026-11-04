@@ -17,6 +17,7 @@ export const ENGLISH_ALLOW_SET = new Set<string>([
   'github', 'actions', 'firebase', 'hosting', 'guid', 'setup', 'email', 'link', 'url',
   'status', 'developer', 'wef', 'reg', 'cmd', 'powershell', 'true', 'false', 'null',
   'teams', 'cmis', 'oms', 'pmis', 'scada', 'gis', 'ems', 'dms', 'erp', 'internet', 'portal',
+  'of', 'the', 'and', 'for', 'from', 'with', 'or', 'on', 'in', 'at', 'by', 'to', 'is', 'line', 'lines', 'leon',
   'fax', 'bar', 'bus', 'gas', 'mix', 'like', 'logic', 'video', 'wifi', 'zalo', 'laptop', 'camera'
 ]);
 

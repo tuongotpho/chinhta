@@ -16,8 +16,9 @@ function buildBoundaryRegex(phrase: string): RegExp {
 }
 
 // Biên dịch trước các regex cho danh sách cụm từ nhầm lẫn đã kiểm duyệt
-const COMPILED_R2: { regex: RegExp; pair: ConfusionPair; exception: RegExp | null }[] = CUM_TU_NHAM_LAN.map(pair => ({
+const COMPILED_R2: { regex: RegExp; needle: string; pair: ConfusionPair; exception: RegExp | null }[] = CUM_TU_NHAM_LAN.map(pair => ({
   regex: buildBoundaryRegex(pair.sai),
+  needle: pair.sai.toLowerCase(),
   pair,
   exception: pair.khongDungTruoc
     ? new RegExp(`^[ \\u00A0]+(?:${pair.khongDungTruoc})(?![\\p{L}\\p{N}])`, 'iu')
@@ -35,7 +36,11 @@ export function checkR2Confusion(
   const errors: SpellError[] = [];
   const userDict = new Set((options?.userDictionary || []).map(w => w.toLowerCase().normalize('NFC')));
 
-  for (const { regex, pair, exception } of COMPILED_R2) {
+  // Lọc nhanh trước: danh sách dài mà chạy biểu thức chính quy cho mọi cụm ở mọi đoạn thì chậm
+  const lowerText = normalizedText.toLowerCase();
+
+  for (const { regex, needle, pair, exception } of COMPILED_R2) {
+    if (!lowerText.includes(needle)) continue;
     regex.lastIndex = 0;
     let match: RegExpExecArray | null;
 

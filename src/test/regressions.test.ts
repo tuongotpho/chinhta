@@ -11,7 +11,7 @@ const words = (text: string) => tokenize(text).allTokens.map(t => t.text);
 const gocs = (text: string) => checkParagraph(text).map(e => e.goc);
 
 beforeAll(() => {
-  const raw = fs.readFileSync(path.join(__dirname, '../../public/assets/ngram-v1.bin'));
+  const raw = fs.readFileSync(path.join(__dirname, '../../public/assets/ngram-v2.bin'));
   setNgramModel(parseNgramModel(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer));
 });
 
@@ -93,7 +93,6 @@ describe('Âm tiết', () => {
 
 describe('Luật ngữ cảnh R8', () => {
   it.each([
-    ['Anh ấy có kỷ thuật tốt.', 'kỷ', 'kỹ'],
     ['Tăng năng xuất lao động.', 'xuất', 'suất']
   ])('%s', (text, wrong, right) => {
     const hit = checkParagraph(text).find(e => e.goc === wrong);
@@ -177,5 +176,33 @@ describe('Nhận diện font cũ', () => {
     expect(detectOldFont('Times New Roman', 'Coâng ty ñieän löïc Vieät Nam').isOldFont).toBe(true);
     expect(detectOldFont('Times New Roman', 'C«ng ty tr¸ch nhiÖm h÷u h¹n').isOldFont).toBe(true);
     expect(detectOldFont('.VnTime', 'bất kỳ').isOldFont).toBe(true);
+  });
+
+  it('từ tiếng Anh ngắn không bị hiểu là gõ Telex', () => {
+    for (const text of ['Certificate of origin', 'Power lines and cables', 'Ông Leon đến thăm']) {
+      expect(checkParagraph(text).filter(e => e.luat === 'R1')).toEqual([]);
+    }
+  });
+
+  it('cụm hay sai trong văn bản hành chính được R2 bắt', () => {
+    for (const [text, goc, dung] of [
+      ['Đơn vị cần sử lý dứt điểm.', 'sử lý', 'xử lý'],
+      ['Anh ấy có kỷ thuật tốt.', 'kỷ thuật', 'kỹ thuật'],
+      ['Đây là việc đáng tiết.', 'đáng tiết', 'đáng tiếc']
+    ]) {
+      const hit = checkParagraph(text).find(e => e.goc === goc);
+      expect(hit?.luat).toBe('R2');
+      expect(hit?.goiY[0]).toBe(dung);
+    }
+  });
+
+  it('không báo các cụm đúng dễ nhầm với lỗi', () => {
+    for (const text of [
+      'Công suất phát điện của tổ máy đạt định mức.',
+      'Khả năng xuất hiện sự cố là rất thấp.',
+      'Tần suất hiện tại đã giảm.'
+    ]) {
+      expect(checkParagraph(text).filter(e => e.luat === 'R2')).toEqual([]);
+    }
   });
 });

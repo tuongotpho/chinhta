@@ -48,11 +48,18 @@ Tài liệu ghi nhận nguồn gốc, giấy phép và phạm vi sử dụng c�
 ---
 
 ## 6. Bảng tần suất cặp âm tiết (Dùng cho Luật R8 và xếp hạng gợi ý)
-- **File:** `public/assets/ngram-v1.bin`, sinh bằng `scripts/build-ngram.py`. Chỉ chứa số đếm, không chứa văn bản.
-- **Nguồn:** Wikipedia tiếng Việt (phần 1 của bản kết xuất `viwiki-latest-pages-articles-multistream1`) và Wikisource tiếng Việt, tải ngày 04/11/2026 từ dumps.wikimedia.org.
-- **Giấy phép:** nội dung Wikimedia theo CC BY-SA 4.0. Cần pháp chế xác nhận nghĩa vụ ghi nguồn và chia sẻ tương tự đối với bảng thống kê trước khi phát hành rộng.
+- **File:** `public/assets/ngram-v2.bin`, sinh bằng `scripts/build-ngram.py`. Chỉ chứa số đếm, không chứa văn bản.
+- **Thống kê từ bài viết:** Wikipedia, Wikisource, Wikibooks và Wiktionary tiếng Việt, bản kết xuất tải ngày 04/11/2026 từ dumps.wikimedia.org, giấy phép CC BY-SA 4.0. Bỏ các bài về loài sinh vật do máy sinh hàng loạt vì làm lệch thống kê.
+- **Danh sách từ để không báo nhầm từ có thật:**
+  - Wiktionary tiếng Việt, CC BY-SA 4.0.
+  - Mục từ tiếng Việt của Wiktionary tiếng Anh, bản trích tại kaikki.org, CC BY-SA 4.0.
+  - Viet74K của Hồ Ngọc Đức, https://informatik.uni-leipzig.de/~duc/software/misc/wordlist.html, bản sao https://github.com/duyet/vietnamese-wordlist, giấy phép GNU GPL. Tác giả đề nghị gửi lại nếu có sửa đổi danh sách; dự án không sửa nội dung danh sách, chỉ dùng các cặp âm tiết.
+- **Giấy phép chung:** vì dùng dữ liệu GPL và CC BY-SA 4.0, toàn bộ add-in phát hành theo GNU GPL phiên bản 3 trở lên (tệp `LICENSE`). Trang gốc Viet74K không ghi số phiên bản GPL, còn bản sao trên GitHub ghi GPL-2.0, nên cần pháp chế xác nhận nếu dùng chính thức ở cơ quan.
 - **Loại trừ:** các cặp trong `data/cum-tu-nham-lan.json` và `data/cap-am-tiet-sai.txt` bị bỏ khỏi bảng vì là lỗi phổ biến có xuất hiện trong kho.
-- **Tham số:** âm tiết xuất hiện từ 30 lần, cặp từ 3 lần. Ngưỡng R8 bằng 8 chọn trên nửa dev của VSEC bằng `scripts/danh-gia-vsec.ts`, không dùng nửa test để chỉnh.
+- **Tham số:** âm tiết xuất hiện từ 30 lần, tối đa 1,8 triệu cặp. Ngưỡng R8 chọn trên nửa dev của VSEC bằng `scripts/danh-gia-vsec.ts`, không dùng nửa test để chỉnh.
 
 ## 7. Dữ liệu chỉ dùng để đánh giá, không đóng gói vào add-in
 - **VSEC:** bộ lỗi chính tả có nhãn, https://github.com/VSEC2021/VSEC, tải về `data/ngoai/` (đã liệt kê ở `.gitignore`).
+
+## 8. Nguồn không dùng
+- **Từ điển tiếng Việt (Viện Ngôn ngữ học, GS. Hoàng Phê chủ biên):** sách còn bản quyền, ghi nguồn không thay được việc xin phép. Không có dữ liệu nào của sách trong add-in hay trong repo. Bản quét trên máy chỉ dùng một lần để đo độ phủ, không lưu lại.

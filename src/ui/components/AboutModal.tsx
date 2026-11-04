@@ -87,6 +87,14 @@ export const AboutModal: React.FC<AboutModalProps> = ({ open, onOpenChange }) =>
               </Text>
             </div>
 
+            <div className={styles.section}>
+              <Text weight="semibold">📚 Nguồn dữ liệu:</Text>
+              <Text size={200}>- Thống kê tiếng Việt từ Wikipedia, Wikisource, Wikibooks và Wiktionary (CC BY-SA 4.0).</Text>
+              <Text size={200}>- Danh sách từ: Wiktionary, Kaikki.org (CC BY-SA 4.0) và Viet74K của Hồ Ngọc Đức (GNU GPL).</Text>
+              <Text size={200}>- Quy tắc viết hoa theo Nghị định 30/2020/NĐ-CP.</Text>
+              <Text size={200}>- Add-in phát hành theo giấy phép GNU GPL phiên bản 3 trở lên.</Text>
+            </div>
+
             <div className={styles.authorFooter}>
               (C) August87 - 0982722036
             </div>
