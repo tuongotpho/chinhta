@@ -1,147 +1,107 @@
 import { SpellError, CheckOptions } from '../types';
 import { Token } from '../tokenizer';
-import { SYLLABLES_LIST } from '../data/syllablesData';
+import { isValidSyllable, suggestCorrection } from '../syllable';
 import { NGANH_DIEN_WORDS } from '../data/nganhDienData';
-
-// Khởi tạo Set âm tiết tra cứu cực nhanh O(1)
-const SYLLABLES_SET = new Set<string>(SYLLABLES_LIST.map(s => s.toLowerCase().normalize('NFC')));
+import { rankByContext } from './r8-context-ngram';
 
 // Danh mục từ ngữ chuyên ngành điện và thuật ngữ kỹ thuật
 const NGANH_DIEN_SET = new Set<string>(NGANH_DIEN_WORDS.map(s => s.toLowerCase().normalize('NFC')));
 
-// Các từ tiếng Anh / công nghệ phổ biến trong văn bản văn phòng
-const ENGLISH_ALLOW_SET = new Set<string>([
-  'word', 'excel', 'powerpoint', 'microsoft', 'office', 'windows', 'mac', 'web',
-  'addin', 'add-in', 'taskpane', 'ribbon', 'online', 'offline', 'server', 'client',
-  'api', 'gui', 'ui', 'ux', 'format', 'font', 'track', 'changes', 'version',
+// Các từ tiếng Anh ngắn dễ bị hiểu nhầm là gõ Telex (bus -> bú). Từ dài không có gợi ý đã tự được bỏ qua.
+export const ENGLISH_ALLOW_SET = new Set<string>([
+  'word', 'excel', 'powerpoint', 'microsoft', 'office', 'windows', 'mac', 'web', 'website',
+  'addin', 'taskpane', 'ribbon', 'online', 'offline', 'server', 'client', 'app', 'apps',
+  'api', 'gui', 'ui', 'ux', 'format', 'font', 'track', 'changes', 'version', 'software', 'hardware',
   'vsto', 'vba', 'macro', 'nfc', 'nfd', 'unicode', 'telex', 'vni', 'pdf', 'doc', 'docx',
   'file', 'data', 'test', 'node', 'react', 'vite', 'npm', 'run', 'build', 'ci', 'cd',
   'github', 'actions', 'firebase', 'hosting', 'guid', 'setup', 'email', 'link', 'url',
-  'status', 'developer', 'wef', 'reg', 'cmd', 'powershell', 'true', 'false', 'null'
+  'status', 'developer', 'wef', 'reg', 'cmd', 'powershell', 'true', 'false', 'null',
+  'teams', 'cmis', 'oms', 'pmis', 'scada', 'gis', 'ems', 'dms', 'erp', 'internet', 'portal',
+  'fax', 'bar', 'bus', 'gas', 'mix', 'like', 'logic', 'video', 'wifi', 'zalo', 'laptop', 'camera'
 ]);
 
-/**
- * Thử phục hồi từ gõ lỗi Telex hoặc thừa ký tự phím
- * Ví dụ: ddieefu -> điều, hoạtt -> hoạt, thnags -> tháng
- */
-function tryFixTelex(word: string): string[] {
-  const suggestions: string[] = [];
-  const lower = word.toLowerCase().normalize('NFC');
+const ASCII_WORD = /^[a-z]+$/;
+// Dấu hiệu gõ Telex rõ ràng: phím bỏ dấu nằm giữa từ hoặc nguyên âm kép
+const TELEX_PATTERN = /dd|aa|ee|oo|aw|ow|uw/;
+const HAS_VOWEL = /[aăâeêioôơuưy]/;
+const HEADING_MIN_WORDS = 3;
+const ROMAN_NUMERAL = /^[ivxlcdm]+$/;
 
-  // Trường hợp 1: Thừa phụ âm cuối do dính phím (hoạtt -> hoạt, đượcc -> được)
-  if (/([b-df-hj-np-tv-zđ])\1$/i.test(lower)) {
-    const single = lower.slice(0, -1);
-    if (SYLLABLES_SET.has(single)) {
-      suggestions.push(single);
+/** Câu là tiêu đề in hoa khi đa số chữ viết hoa và có ít nhất hai âm tiết tiếng Việt thật */
+function findHeadingSentences(tokens: Token[]): Set<number> {
+  const stats = new Map<number, { words: number; caps: number; syllables: number }>();
+  for (const token of tokens) {
+    if (!token.isWord) continue;
+    const entry = stats.get(token.sentenceIndex) ?? { words: 0, caps: 0, syllables: 0 };
+    entry.words++;
+    if (token.isAllCaps) {
+      entry.caps++;
+      if (isValidSyllable(token.lowerText)) entry.syllables++;
+    }
+    stats.set(token.sentenceIndex, entry);
+  }
+  const headings = new Set<number>();
+  for (const [index, entry] of stats) {
+    if (entry.words >= HEADING_MIN_WORDS && entry.caps / entry.words >= 0.6 && entry.syllables >= 2) {
+      headings.add(index);
     }
   }
-
-  // Trường hợp 2: Gõ nhầm telex ddieefu, ddieeu, tieengs
-  let candidate = lower
-    .replace(/^dd/, 'đ')
-    .replace(/aa/g, 'â')
-    .replace(/aw/g, 'ă')
-    .replace(/ee/g, 'ê')
-    .replace(/oo/g, 'ô')
-    .replace(/ow/g, 'ơ')
-    .replace(/uw/g, 'ư');
-
-  // Xử lý phím dấu telex lạc vị trí (s: sắc, f: huyền, r: hỏi, x: ngã, j: nặng)
-  // Ví dụ: ddieefu -> điều (ef -> iều)
-  if (candidate.includes('efu') || candidate.includes('iêfu')) {
-    candidate = candidate.replace('efu', 'iều').replace('iêfu', 'iều');
-  }
-  if (candidate.includes('eeu')) {
-    candidate = candidate.replace('eeu', 'iêu');
-  }
-
-  // Nếu chữ có phím dấu ở cuối: ví dụ thnags -> tháng
-  if (/[a-z]+[sfrxj]$/.test(candidate)) {
-    const lastChar = candidate[candidate.length - 1];
-    const stem = candidate.slice(0, -1);
-    // Ánh xạ phím dấu vào nguyên âm gần nhất
-    const toneMap: Record<string, Record<string, string>> = {
-      's': { 'a': 'á', 'ă': 'ắ', 'â': 'ấ', 'e': 'é', 'ê': 'ế', 'i': 'í', 'o': 'ó', 'ô': 'ố', 'ơ': 'ớ', 'u': 'ú', 'ư': 'ứ', 'y': 'ý' },
-      'f': { 'a': 'à', 'ă': 'ằ', 'â': 'ầ', 'e': 'è', 'ê': 'ề', 'i': 'ì', 'o': 'ò', 'ô': 'ồ', 'ơ': 'ờ', 'u': 'ù', 'ư': 'ừ', 'y': 'ỳ' },
-      'r': { 'a': 'ả', 'ă': 'ẳ', 'â': 'ẩ', 'e': 'ẻ', 'ê': 'ể', 'i': 'ỉ', 'o': 'ỏ', 'ô': 'ổ', 'ơ': 'ở', 'u': 'ủ', 'ư': 'ử', 'y': 'ỷ' },
-      'x': { 'a': 'ã', 'ă': 'ẵ', 'â': 'ẫ', 'e': 'ẽ', 'ê': 'ễ', 'i': 'ĩ', 'o': 'õ', 'ô': 'ỗ', 'ơ': 'ỡ', 'u': 'ũ', 'ư': 'ữ', 'y': 'ỹ' },
-      'j': { 'a': 'ạ', 'ă': 'ặ', 'â': 'ậ', 'e': 'ẹ', 'ê': 'ệ', 'i': 'ị', 'o': 'ọ', 'ô': 'ộ', 'ơ': 'ợ', 'u': 'ụ', 'ư': 'ự', 'y': 'ỵ' }
-    };
-    if (toneMap[lastChar]) {
-      // Tìm nguyên âm trong stem
-      for (const [vowel, toned] of Object.entries(toneMap[lastChar])) {
-        if (stem.includes(vowel)) {
-          const replaced = stem.replace(vowel, toned);
-          if (SYLLABLES_SET.has(replaced)) {
-            suggestions.push(replaced);
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  // Trường hợp ddieefu -> điều
-  if (lower === 'ddieefu') {
-    suggestions.push('điều');
-  } else if (lower === 'hoạtt') {
-    suggestions.push('hoạt');
-  } else if (lower === 'thnags') {
-    suggestions.push('tháng');
-  }
-
-  if (SYLLABLES_SET.has(candidate) && !suggestions.includes(candidate)) {
-    suggestions.push(candidate);
-  }
-
-  return Array.from(new Set(suggestions));
+  return headings;
 }
 
 /**
- * Luật R1: Âm tiết không hợp lệ, gõ nhầm Telex / VNI (Mức: Chắc chắn)
+ * Luật R1: Âm tiết không hợp lệ, gõ nhầm Telex / VNI.
+ * - Có dấu tiếng Việt mà sai cấu tạo: mức Chắc chắn.
+ * - Chữ không dấu không có gợi ý: coi là từ nước ngoài, bỏ qua theo đề bài.
+ * - Chữ không dấu có gợi ý nhưng không rõ là Telex: mức Nên xem, không đưa vào sửa hàng loạt.
  */
-export function checkR1Syllables(
-  tokens: Token[],
-  options?: CheckOptions
-): SpellError[] {
+export function checkR1Syllables(tokens: Token[], options?: CheckOptions): SpellError[] {
   const errors: SpellError[] = [];
   const userDict = new Set((options?.userDictionary || []).map(w => w.toLowerCase().normalize('NFC')));
+  const headings = findHeadingSentences(tokens);
 
-  for (const token of tokens) {
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
     if (!token.isWord) continue;
-    if (token.isIgnored) continue;
-    if (token.isProperNoun) continue;
 
     const lower = token.lowerText.normalize('NFC');
+    const chars = [...lower];
+    const inHeading = token.isAllCaps && headings.has(token.sentenceIndex);
+    const isAscii = ASCII_WORD.test(lower);
+    // Kẹt phím Shift: cCơ, vViệc. Mã hiệu như TTg, TTr không tạo thành âm tiết nên không dính.
+    const stuckShift =
+      token.isIgnored && !token.isAllCaps && chars[0] === chars[1] && isValidSyllable(chars.slice(1).join(''));
 
-    // Kiểm tra trong danh mục hợp lệ
-    if (SYLLABLES_SET.has(lower)) continue;
-    if (NGANH_DIEN_SET.has(lower)) continue;
-    if (userDict.has(lower)) continue;
-    if (ENGLISH_ALLOW_SET.has(lower)) continue;
+    if (token.isIgnored && !inHeading && !stuckShift) continue;
+    if (chars.length === 1) continue; // Chữ cái đơn: điểm b, b), Đ/c
+    if (isValidSyllable(lower)) continue;
+    if (NGANH_DIEN_SET.has(lower) || userDict.has(lower) || ENGLISH_ALLOW_SET.has(lower)) continue;
+    if (inHeading && (!HAS_VOWEL.test(lower) || ROMAN_NUMERAL.test(lower))) continue;
 
-    // Dấu hiệu nhận diện từ gõ sai Telex hoặc âm tiết sai kết cấu tiếng Việt
-    const isCorruptTelex =
-      /(dd|ee|oo|aa|aw|ow|uw|[b-df-hj-np-tv-zđ]{2,}$)/i.test(lower) ||
-      /[áàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụýỳỷỹỵăắằẳẵặâấầẩẫậêếềểễệôốồổỗộơớờởỡợưứừửữự][b-df-hj-np-tv-zđ]{2,}/i.test(lower) ||
-      /^[a-zđ]*[sfrxj]$/i.test(lower) && !SYLLABLES_SET.has(lower);
+    // Tên riêng giữa câu được bỏ qua, trừ chữ có dấu sai cấu tạo như "Viẹt", vì tên thật không viết vậy
+    if (token.isProperNoun && isAscii) continue;
 
-    // Hoặc từ chứa dấu tiếng Việt nhưng không có trong từ điển âm tiết chuẩn
-    const hasVietnameseChar = /[đưêôáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụýỳỷỹỵăâơ]/i.test(lower);
+    const neighbour = (other?: Token) => (other?.isWord ? other.lowerText.normalize('NFC') : null);
+    const suggestions = stuckShift
+      ? [chars.slice(1).join('')]
+      : rankByContext(suggestCorrection(token.text), neighbour(tokens[index - 1]), neighbour(tokens[index + 1]));
+    if (token.isProperNoun && suggestions.length === 0) continue;
 
-    if (isCorruptTelex || hasVietnameseChar) {
-      const suggestions = tryFixTelex(token.text);
+    // Chữ in hoa trong tiêu đề chỉ báo khi có gợi ý, nếu không dễ là viết tắt
+    if ((isAscii || inHeading) && suggestions.length === 0) continue;
 
-      errors.push({
-        luat: 'R1',
-        batDau: token.start,
-        ketThuc: token.end,
-        goc: token.text,
-        goiY: suggestions,
-        mucDo: 'chac-chan',
-        lyDo: 'Âm tiết không hợp lệ hoặc gõ nhầm Telex/VNI'
-      });
-    }
+    const certain = !inHeading && !token.isProperNoun && !stuckShift && (!isAscii || TELEX_PATTERN.test(lower));
+    errors.push({
+      luat: 'R1',
+      batDau: token.start,
+      ketThuc: token.end,
+      goc: token.text,
+      goiY: suggestions,
+      mucDo: certain ? 'chac-chan' : 'nen-xem',
+      lyDo: certain
+        ? 'Âm tiết không hợp lệ trong tiếng Việt hoặc gõ nhầm Telex/VNI'
+        : 'Chữ này không phải âm tiết tiếng Việt, có thể gõ thiếu dấu hoặc là từ nước ngoài'
+    });
   }
 
   return errors;

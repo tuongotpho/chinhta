@@ -5,6 +5,7 @@ import {
   tokens,
   Button,
   Spinner,
+  Checkbox,
   MessageBar,
   MessageBarBody
 } from '@fluentui/react-components';
@@ -13,6 +14,8 @@ import {
   SelectAllOnRegular,
   WandRegular
 } from '@fluentui/react-icons';
+import { CheckOptions } from '../../engine/types';
+import { Notice } from '../hooks/useChecker';
 
 const useStyles = makeStyles({
   container: {
@@ -45,6 +48,10 @@ interface ScanControlsProps {
   onOpenBatchModal: () => void;
   sureCount: number;
   oldFontWarning: string | null;
+  notice: Notice | null;
+  hasScanned: boolean;
+  options: CheckOptions;
+  onOptionsChange: (options: CheckOptions) => void;
 }
 
 export const ScanControls: React.FC<ScanControlsProps> = ({
@@ -53,7 +60,11 @@ export const ScanControls: React.FC<ScanControlsProps> = ({
   onScanSelection,
   onOpenBatchModal,
   sureCount,
-  oldFontWarning
+  oldFontWarning,
+  notice,
+  hasScanned,
+  options,
+  onOptionsChange
 }) => {
   const styles = useStyles();
 
@@ -62,6 +73,18 @@ export const ScanControls: React.FC<ScanControlsProps> = ({
       {oldFontWarning && (
         <MessageBar intent="warning">
           <MessageBarBody>{oldFontWarning}</MessageBarBody>
+        </MessageBar>
+      )}
+
+      {notice && (
+        <MessageBar intent={notice.intent}>
+          <MessageBarBody>{notice.text}</MessageBarBody>
+        </MessageBar>
+      )}
+
+      {hasScanned && (
+        <MessageBar intent="info">
+          <MessageBarBody>Chưa quét đầu trang, chân trang, chú thích và hộp văn bản.</MessageBarBody>
         </MessageBar>
       )}
 
@@ -84,6 +107,19 @@ export const ScanControls: React.FC<ScanControlsProps> = ({
         >
           Vùng chọn
         </Button>
+      </div>
+
+      <div className={styles.buttonRow}>
+        <Checkbox
+          label="Xét ngữ cảnh (R8)"
+          checked={options.enableR8 !== false}
+          onChange={(_, data) => onOptionsChange({ ...options, enableR8: Boolean(data.checked) })}
+        />
+        <Checkbox
+          label="Thống nhất kiểu dấu (R7)"
+          checked={options.enableR7 === true}
+          onChange={(_, data) => onOptionsChange({ ...options, enableR7: Boolean(data.checked) })}
+        />
       </div>
 
       {sureCount > 0 && (

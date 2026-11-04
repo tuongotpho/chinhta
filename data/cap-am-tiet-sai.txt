@@ -1,0 +1,21 @@
+# Cặp âm tiết là lỗi chính tả phổ biến, có xuất hiện trong kho Wikipedia/Wikisource.
+# scripts/build-ngram.py loại các cặp này khỏi mô hình để R8 không coi chúng là tiếng Việt đúng.
+# Mỗi dòng một cặp. Không đưa vào đây cặp có thể đúng trong câu khác, ví dụ "cũng cố" (cũng cố gắng).
+công xuất
+năng xuất
+đề suất
+xác xuất
+sử lý
+kỹ luật
+kỷ năng
+kỷ thuật
+cập nhập
+lăng lực
+lỗ lực
+bão dưỡng
+sửa chửa
+sữa chữa
+xuất xắc
+suất sắc
+thành lặp
+trương trình

@@ -8,7 +8,7 @@ import { UserDictionaryModal } from './components/UserDictionaryModal';
 import { AboutModal } from './components/AboutModal';
 import { Footer } from './components/Footer';
 import { useUserDictionary } from './hooks/useUserDictionary';
-import { useChecker } from './hooks/useChecker';
+import { useChecker, isBatchEligible } from './hooks/useChecker';
 
 export const App: React.FC = () => {
   const {
@@ -24,10 +24,14 @@ export const App: React.FC = () => {
     isScanning,
     hasScanned,
     oldFontWarning,
+    notice,
+    options,
+    setOptions,
     scan,
     selectInWord,
     fixError,
     ignoreError,
+    dropWord,
     batchFixSure,
     updateSuggestion
   } = useChecker(dictWords);
@@ -37,7 +41,7 @@ export const App: React.FC = () => {
   const [isBatchOpen, setIsBatchOpen] = useState(false);
   const [isFixingBatch, setIsFixingBatch] = useState(false);
 
-  const sureItems = items.filter(i => i.error.mucDo === 'chac-chan');
+  const sureItems = items.filter(isBatchEligible);
 
   const handleConfirmBatch = async () => {
     setIsFixingBatch(true);
@@ -65,6 +69,10 @@ export const App: React.FC = () => {
           onOpenBatchModal={() => setIsBatchOpen(true)}
           sureCount={sureItems.length}
           oldFontWarning={oldFontWarning}
+          notice={notice}
+          hasScanned={hasScanned}
+          options={options}
+          onOptionsChange={setOptions}
         />
 
         <main className="main-content">
@@ -74,7 +82,7 @@ export const App: React.FC = () => {
             onSelect={selectInWord}
             onFix={(item, sug) => fixError(item, sug)}
             onIgnore={ignoreError}
-            onAddToDict={(w) => addWord(w)}
+            onAddToDict={(w) => { addWord(w); dropWord(w); }}
             onUpdateSuggestion={updateSuggestion}
           />
         </main>

@@ -8,6 +8,23 @@ import { checkR4Typography } from './rules/r4-typography';
 import { checkR5Repetition } from './rules/r5-repetition';
 import { checkR6Organization } from './rules/r6-organization';
 import { checkR7ToneStyle } from './rules/r7-tone-style';
+import { checkR8ContextNgram } from './rules/r8-context-ngram';
+
+/** Luật có gợi ý là chữ thường cần trả về đúng kiểu hoa/thường của chữ gốc */
+const CASE_MATCHED_RULES = new Set(['R1', 'R2', 'R3', 'R8']);
+
+export function matchCase(original: string, suggestion: string): string {
+  const letters = [...original].filter(ch => ch.toLowerCase() !== ch.toUpperCase());
+  if (letters.length >= 2 && letters.every(ch => ch === ch.toUpperCase())) {
+    return suggestion.toUpperCase();
+  }
+  if (letters.length > 0 && letters[0] === letters[0].toUpperCase()) {
+    const chars = [...suggestion];
+    chars[0] = chars[0].toUpperCase();
+    return chars.join('');
+  }
+  return suggestion;
+}
 
 const SEVERITY_WEIGHT: Record<string, number> = {
   'chac-chan': 3,
@@ -68,6 +85,11 @@ export function checkParagraph(
     rawErrors.push(...checkR7ToneStyle(normText));
   }
 
+  // R8 chạy sau cùng: chỗ đã có luật chắc chắn hơn thì bước lọc trùng sẽ giữ luật đó
+  if (options.enableR8 !== false) {
+    rawErrors.push(...checkR8ContextNgram(sentences, options));
+  }
+
   // 4. Lọc trùng lặp & giải quyết xung đột vùng span đè lên nhau
   // Sắp xếp theo vị trí bắt đầu tăng dần, nếu bằng nhau thì ưu tiên mức độ chắc chắn cao hơn
   rawErrors.sort((a, b) => {
@@ -93,11 +115,13 @@ export function checkParagraph(
     const origEnd = toOriginalOffset(err.ketThuc);
     const originalGoc = originalText.slice(origStart, origEnd);
 
+    const goc = originalGoc || err.goc;
     return {
       ...err,
       batDau: origStart,
       ketThuc: origEnd,
-      goc: originalGoc || err.goc
+      goc,
+      goiY: CASE_MATCHED_RULES.has(err.luat) ? err.goiY.map(s => matchCase(goc, s)) : err.goiY
     };
   });
 

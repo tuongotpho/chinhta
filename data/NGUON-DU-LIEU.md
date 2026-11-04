@@ -4,12 +4,9 @@ Tài liệu ghi nhận nguồn gốc, giấy phép và phạm vi sử dụng c�
 
 ---
 
-## 1. Tập âm tiết tiếng Việt hợp lệ (Dùng cho Luật R1)
-- **Nguồn:** Danh mục âm tiết ngữ âm Tiếng Việt chuẩn hóa theo quy tắc chính tả hiện hành của Bộ Giáo dục & Đào tạo và Viện Ngôn ngữ học.
-- **Quy mô:** ~6.800 âm tiết chuẩn có nghĩa và hợp lệ trong tiếng Việt hiện đại.
-- **Giấy phép:** Dữ liệu chuẩn ngôn ngữ công cộng (Public Domain / Tri thức mở), không vi phạm bản quyền từ điển thương mại.
-- **Ngày thu thập:** 04/11/2026.
-- **Mục đích:** Kiểm tra cấu trúc âm tiết hợp lệ (phụ âm đầu + âm đệm + nguyên âm chính + âm cuối + thanh điệu). Phát hiện các từ gõ sai bàn phím Telex/VNI (như `ddieefu`, `hoạtt`).
+## 1. Kiểm tra âm tiết (Dùng cho Luật R1)
+- **Cách làm:** quy tắc cấu tạo âm tiết trong `src/engine/syllable.ts` (phụ âm đầu, vần, thanh), không dùng danh sách. Tệp `data/am-tiet-tieng-viet.txt` hiện không được dùng.
+- **Giới hạn:** quy tắc chấp nhận cả dạng đúng cấu tạo nhưng không có thật, phần này do luật R8 bù lại.
 
 ---
 
@@ -27,6 +24,8 @@ Tài liệu ghi nhận nguồn gốc, giấy phép và phạm vi sử dụng c�
 - **Nguồn:** Tổng hợp các lỗi chính tả phổ biến trong văn bản hành chính Việt Nam đã được kiểm duyệt nghiêm ngặt (s/x, tr/ch, d/gi/r, l/n, c/t, hỏi/ngã dạng sai tuyệt đối).
 - **Nguyên tắc:** Chỉ đưa vào các cặp mà dạng sai 100% không có nghĩa trong tiếng Việt chuẩn (ví dụ: `xản xuất` -> `sản xuất`, `xắp xếp` -> `sắp xếp`, `trân thành` -> `chân thành`).
 - **Giấy phép:** Tự tổng hợp và biên tập nội bộ.
+- **Ghi chú 04/11/2026:** đã gỡ 49 cặp trùng nguyên văn danh sách lỗi của một phần mềm thương mại, chưa rõ quyền sử dụng. Không thêm dữ liệu từ phần mềm khác vào tệp này.
+- **Trường `khongDungTruoc`:** mẫu chữ đứng ngay sau khiến cụm không phải lỗi, ví dụ `xúc tích` trong `tiếp xúc tích cực`.
 
 ---
 
@@ -45,3 +44,15 @@ Tài liệu ghi nhận nguồn gốc, giấy phép và phạm vi sử dụng c�
   - Viết thường hoàn toàn (ví dụ: `bộ tài chính`) -> Báo lỗi mức Nên xem.
   - Viết chuẩn (ví dụ: `Bộ Tài chính`) -> Không báo lỗi.
   - Viết hoa toàn bộ (ví dụ: `BỘ TÀI CHÍNH` trong tiêu đề) -> Không báo lỗi.
+
+---
+
+## 6. Bảng tần suất cặp âm tiết (Dùng cho Luật R8 và xếp hạng gợi ý)
+- **File:** `public/assets/ngram-v1.bin`, sinh bằng `scripts/build-ngram.py`. Chỉ chứa số đếm, không chứa văn bản.
+- **Nguồn:** Wikipedia tiếng Việt (phần 1 của bản kết xuất `viwiki-latest-pages-articles-multistream1`) và Wikisource tiếng Việt, tải ngày 04/11/2026 từ dumps.wikimedia.org.
+- **Giấy phép:** nội dung Wikimedia theo CC BY-SA 4.0. Cần pháp chế xác nhận nghĩa vụ ghi nguồn và chia sẻ tương tự đối với bảng thống kê trước khi phát hành rộng.
+- **Loại trừ:** các cặp trong `data/cum-tu-nham-lan.json` và `data/cap-am-tiet-sai.txt` bị bỏ khỏi bảng vì là lỗi phổ biến có xuất hiện trong kho.
+- **Tham số:** âm tiết xuất hiện từ 30 lần, cặp từ 3 lần. Ngưỡng R8 bằng 8 chọn trên nửa dev của VSEC bằng `scripts/danh-gia-vsec.ts`, không dùng nửa test để chỉnh.
+
+## 7. Dữ liệu chỉ dùng để đánh giá, không đóng gói vào add-in
+- **VSEC:** bộ lỗi chính tả có nhãn, https://github.com/VSEC2021/VSEC, tải về `data/ngoai/` (đã liệt kê ở `.gitignore`).

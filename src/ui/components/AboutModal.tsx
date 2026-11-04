@@ -57,7 +57,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ open, onOpenChange }) =>
                 - Văn bản 100% <strong>không bao giờ rời khỏi máy tính</strong> của bạn.
               </Text>
               <Text size={200}>
-                - Không sử dụng AI, LLM hay gửi văn bản qua máy chủ bên ngoài.
+                - Không sử dụng AI, LLM hay gửi văn bản qua máy chủ bên ngoài. Add-in chỉ tải về bảng thống kê tần suất cặp âm tiết.
               </Text>
               <Text size={200}>
                 - Không làm hỏng định dạng bảng biểu, hình ảnh hay tính năng Theo dõi sửa đổi (Track Changes).

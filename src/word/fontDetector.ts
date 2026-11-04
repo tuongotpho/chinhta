@@ -12,10 +12,13 @@ const OLD_FONT_NAMES = new Set([
 
 // Ký tự đặc trưng của bảng mã TCVN3 (ABC 1 byte)
 // ví dụ: µ, ¸, ¶, ·, ¹, ¨, », ¾, ¼, ½
-const TCVN3_CHAR_REGEX = /[µ¸¶·¹¨»¾¼½§©®™]/;
+// Các dấu ©, ®, ½ có thể xuất hiện đơn lẻ trong văn bản Unicode, nên phải gặp nhiều lần mới kết luận.
+const TCVN3_CHAR_REGEX = /[µ¸¶·¹¨»§«¬ÖË]/g;
+const TCVN3_MIN_MATCHES = 3;
 
-// Ký tự đặc trưng của bảng mã VNI Windows
-const VNI_CHAR_REGEX = /[àáâãèéêìíòóôõùúý][1-8]/i;
+// Tổ hợp chỉ có ở bảng mã VNI Windows: chữ gốc + ký tự dấu rời như "coâng", "Vieät", "ñieän"
+const VNI_CHAR_REGEX = /[aeo][âãäåæçéèêë]|ñ[aeiou]|ö[ôõ]/gi;
+const VNI_MIN_MATCHES = 2;
 
 export interface FontCheckResult {
   isOldFont: boolean;
@@ -36,7 +39,7 @@ export function detectOldFont(fontName?: string, sampleText?: string): FontCheck
   }
 
   if (sampleText) {
-    if (TCVN3_CHAR_REGEX.test(sampleText)) {
+    if ((sampleText.match(TCVN3_CHAR_REGEX)?.length ?? 0) >= TCVN3_MIN_MATCHES) {
       return {
         isOldFont: true,
         reason: 'tcvn3-encoding',
@@ -44,7 +47,7 @@ export function detectOldFont(fontName?: string, sampleText?: string): FontCheck
       };
     }
 
-    if (VNI_CHAR_REGEX.test(sampleText)) {
+    if ((sampleText.match(VNI_CHAR_REGEX)?.length ?? 0) >= VNI_MIN_MATCHES) {
       return {
         isOldFont: true,
         reason: 'vni-encoding',

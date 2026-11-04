@@ -1,0 +1,531 @@
+{
+  "loi": [
+    {
+      "id": 1,
+      "viTri": "Mục 1",
+      "sai": "THỰC HIÊN",
+      "dung": "THỰC HIỆN",
+      "loai": "Tiêu đề in hoa",
+      "batDau": 18,
+      "ketThuc": 27,
+      "doan": "BÁO CÁO TÌNH HÌNH THỰC HIÊN KẾ HOẠCH QUÝ III NĂM 2026"
+    },
+    {
+      "id": 2,
+      "viTri": "Mục 5",
+      "sai": "thi hàng",
+      "dung": "thi hành",
+      "loai": "Lạc ngữ cảnh",
+      "batDau": 150,
+      "ketThuc": 158,
+      "doan": "Căn cứ Quyết định số 1825/QĐ-EVNNPC ngày 12/6/2026 của Tổng công ty Điện lực miền Bắc và điểm c khoản 3 Điều 8 Thông tư số 25/2016/TT-BCT, Công ty đã thi hàng đầy đủ các chỉ tiêu được giao. Sản lượng điện thương phẩm quý III đạt 412,6 triệu kWh, tăng 7,3% so với cùng kỳ; tổn thât điện năng đạt 4,18%, thấp hơn kế hoạch 0,12%."
+    },
+    {
+      "id": 3,
+      "viTri": "Mục 5",
+      "sai": "thât",
+      "dung": "thất",
+      "loai": "Sai cấu tạo",
+      "batDau": 276,
+      "ketThuc": 280,
+      "doan": "Căn cứ Quyết định số 1825/QĐ-EVNNPC ngày 12/6/2026 của Tổng công ty Điện lực miền Bắc và điểm c khoản 3 Điều 8 Thông tư số 25/2016/TT-BCT, Công ty đã thi hàng đầy đủ các chỉ tiêu được giao. Sản lượng điện thương phẩm quý III đạt 412,6 triệu kWh, tăng 7,3% so với cùng kỳ; tổn thât điện năng đạt 4,18%, thấp hơn kế hoạch 0,12%."
+    },
+    {
+      "id": 4,
+      "viTri": "Mục 6",
+      "sai": "hành",
+      "dung": "hàng",
+      "loai": "Lạc ngữ cảnh",
+      "batDau": 88,
+      "ketThuc": 92,
+      "doan": "Giá bán điện bình quân đạt 2.146,35 đ/kWh. Doanh thu ước đạt 885.000.000.000đ. Số khách hành sử dụng điện tăng thêm 4.215 hộ, đưa tổng số lên 612.450 khách hàng."
+    },
+    {
+      "id": 6,
+      "viTri": "Mục 8",
+      "sai": "hàng",
+      "dung": "hành",
+      "loai": "Lạc ngữ cảnh, chữ đậm trong cụm",
+      "batDau": 14,
+      "ketThuc": 18,
+      "doan": "Đơn vị đã vận hàng an toàn 12 trạm biến áp 110kV, 4.860 trạm biến áp phân phối và 3.215 km đường giây trung áp. Trong quý không xảy ra tai nạn lao đông. Số vụ sự cố thoáng qua giảm 11 vụ, sự cố kéo dài giảm 3 vụ so với cùng kỳ."
+    },
+    {
+      "id": 7,
+      "viTri": "Mục 8",
+      "sai": "đường giây",
+      "dung": "đường dây",
+      "loai": "Lạc ngữ cảnh",
+      "batDau": 91,
+      "ketThuc": 101,
+      "doan": "Đơn vị đã vận hàng an toàn 12 trạm biến áp 110kV, 4.860 trạm biến áp phân phối và 3.215 km đường giây trung áp. Trong quý không xảy ra tai nạn lao đông. Số vụ sự cố thoáng qua giảm 11 vụ, sự cố kéo dài giảm 3 vụ so với cùng kỳ."
+    },
+    {
+      "id": 8,
+      "viTri": "Mục 8",
+      "sai": "đông",
+      "dung": "động",
+      "loai": "Lạc ngữ cảnh",
+      "batDau": 147,
+      "ketThuc": 151,
+      "doan": "Đơn vị đã vận hàng an toàn 12 trạm biến áp 110kV, 4.860 trạm biến áp phân phối và 3.215 km đường giây trung áp. Trong quý không xảy ra tai nạn lao đông. Số vụ sự cố thoáng qua giảm 11 vụ, sự cố kéo dài giảm 3 vụ so với cùng kỳ."
+    },
+    {
+      "id": 9,
+      "viTri": "Mục 10",
+      "sai": "nghiêm thu",
+      "dung": "nghiệm thu",
+      "loai": "Lạc ngữ cảnh",
+      "batDau": 50,
+      "ketThuc": 60,
+      "doan": "Tuy nhiên, công tác kiểm tra hiện trường còn chưa nghiêm thu đúng hạn, một số hồ sơ phải bổ xung nhiều lần. Các đơn vị cần xắp xếp lại lịch công tác , bảo đảm đúng tiến độ."
+    },
+    {
+      "id": 10,
+      "viTri": "Mục 10",
+      "sai": "bổ xung",
+      "dung": "bổ sung",
+      "loai": "Danh sách R2",
+      "batDau": 89,
+      "ketThuc": 96,
+      "doan": "Tuy nhiên, công tác kiểm tra hiện trường còn chưa nghiêm thu đúng hạn, một số hồ sơ phải bổ xung nhiều lần. Các đơn vị cần xắp xếp lại lịch công tác , bảo đảm đúng tiến độ."
+    },
+    {
+      "id": 11,
+      "viTri": "Mục 10",
+      "sai": "xắp xếp",
+      "dung": "sắp xếp",
+      "loai": "Danh sách R2",
+      "batDau": 123,
+      "ketThuc": 130,
+      "doan": "Tuy nhiên, công tác kiểm tra hiện trường còn chưa nghiêm thu đúng hạn, một số hồ sơ phải bổ xung nhiều lần. Các đơn vị cần xắp xếp lại lịch công tác , bảo đảm đúng tiến độ."
+    },
+    {
+      "id": 12,
+      "viTri": "Mục 10",
+      "sai": " ,",
+      "dung": ",",
+      "loai": "Dấu câu",
+      "batDau": 148,
+      "ketThuc": 150,
+      "doan": "Tuy nhiên, công tác kiểm tra hiện trường còn chưa nghiêm thu đúng hạn, một số hồ sơ phải bổ xung nhiều lần. Các đơn vị cần xắp xếp lại lịch công tác , bảo đảm đúng tiến độ."
+    },
+    {
+      "id": 13,
+      "viTri": "Mục 11",
+      "sai": "hoạtt",
+      "dung": "hoạt",
+      "loai": "Sai cấu tạo, lần 1 trong đoạn",
+      "batDau": 15,
+      "ketThuc": 20,
+      "doan": "Phòng Kỹ thuật hoạtt động độc lập, Phòng An toàn hoạtt động theo chuyên đề, còn các Đội Quản lý điện hoạtt động theo địa bàn."
+    },
+    {
+      "id": 14,
+      "viTri": "Mục 11",
+      "sai": "hoạtt",
+      "dung": "hoạt",
+      "loai": "Sai cấu tạo, lần 2 trong đoạn",
+      "batDau": 49,
+      "ketThuc": 54,
+      "doan": "Phòng Kỹ thuật hoạtt động độc lập, Phòng An toàn hoạtt động theo chuyên đề, còn các Đội Quản lý điện hoạtt động theo địa bàn."
+    },
+    {
+      "id": 15,
+      "viTri": "Mục 11",
+      "sai": "hoạtt",
+      "dung": "hoạt",
+      "loai": "Sai cấu tạo, lần 3 trong đoạn",
+      "batDau": 101,
+      "ketThuc": 106,
+      "doan": "Phòng Kỹ thuật hoạtt động độc lập, Phòng An toàn hoạtt động theo chuyên đề, còn các Đội Quản lý điện hoạtt động theo địa bàn."
+    },
+    {
+      "id": 16,
+      "viTri": "Mục 12",
+      "sai": "các các",
+      "dung": "các",
+      "loai": "Lặp từ",
+      "batDau": 8,
+      "ketThuc": 15,
+      "doan": "Đề nghị các các đơn vị phối hợp với Sở Công Thương, Ủy ban nhân dân các cấp và bộ công thương để tháo gỡ vướng mắc. Văn bản trả lời của tập đoàn điện lực việt nam đã được chuyển về đơn vị."
+    },
+    {
+      "id": 17,
+      "viTri": "Mục 12",
+      "sai": "bộ công thương",
+      "dung": "Bộ Công Thương",
+      "loai": "Viết hoa cơ quan",
+      "batDau": 79,
+      "ketThuc": 93,
+      "doan": "Đề nghị các các đơn vị phối hợp với Sở Công Thương, Ủy ban nhân dân các cấp và bộ công thương để tháo gỡ vướng mắc. Văn bản trả lời của tập đoàn điện lực việt nam đã được chuyển về đơn vị."
+    },
+    {
+      "id": 18,
+      "viTri": "Mục 12",
+      "sai": "tập đoàn điện lực việt nam",
+      "dung": "Tập đoàn Điện lực Việt Nam",
+      "loai": "Viết hoa cơ quan",
+      "batDau": 136,
+      "ketThuc": 162,
+      "doan": "Đề nghị các các đơn vị phối hợp với Sở Công Thương, Ủy ban nhân dân các cấp và bộ công thương để tháo gỡ vướng mắc. Văn bản trả lời của tập đoàn điện lực việt nam đã được chuyển về đơn vị."
+    },
+    {
+      "id": 19,
+      "viTri": "Mục 13",
+      "sai": "HOACH",
+      "dung": "HOẠCH",
+      "loai": "Tiêu đề in hoa",
+      "batDau": 7,
+      "ketThuc": 12,
+      "doan": "II. KẾ HOACH SỬA CHỮA LỚN QUÝ IV"
+    },
+    {
+      "id": 29,
+      "viTri": "Bảng hạng mục",
+      "sai": "máy biến ấp",
+      "dung": "máy biến áp",
+      "loai": "Trong ô bảng",
+      "batDau": 5,
+      "ketThuc": 16,
+      "doan": "Thay máy biến ấp T2"
+    },
+    {
+      "id": 30,
+      "viTri": "Bảng hạng mục",
+      "sai": "thánh",
+      "dung": "tháng",
+      "loai": "Trong ô bảng",
+      "batDau": 11,
+      "ketThuc": 16,
+      "doan": "Hoàn thành thánh 12"
+    },
+    {
+      "id": 31,
+      "viTri": "Bảng hạng mục",
+      "sai": "hệ thông",
+      "dung": "hệ thống",
+      "loai": "Trong ô bảng",
+      "batDau": 9,
+      "ketThuc": 17,
+      "doan": "Sửa chữa hệ thông tiếp địa"
+    },
+    {
+      "id": 20,
+      "viTri": "Mục 15",
+      "sai": "( 05 )",
+      "dung": "(05)",
+      "loai": "Dấu câu",
+      "batDau": 20,
+      "ketThuc": 26,
+      "doan": "Nội dung đầu tư gồm ( 05 ) hạng mục, tổng dự toán 36,2 tỷ đồng. Các đơn vị báo cáo trước ngày 15/12/2026.Phòng Kế hoạch-Đầu tư tổng hợp, Phòng Tài chính-Kế toán bố trí nguồn vốn, theo đúng quy đinh hiện hành."
+    },
+    {
+      "id": 21,
+      "viTri": "Mục 15",
+      "sai": "Phòng",
+      "dung": " Phòng",
+      "loai": "Dấu câu",
+      "batDau": 105,
+      "ketThuc": 110,
+      "doan": "Nội dung đầu tư gồm ( 05 ) hạng mục, tổng dự toán 36,2 tỷ đồng. Các đơn vị báo cáo trước ngày 15/12/2026.Phòng Kế hoạch-Đầu tư tổng hợp, Phòng Tài chính-Kế toán bố trí nguồn vốn, theo đúng quy đinh hiện hành."
+    },
+    {
+      "id": 22,
+      "viTri": "Mục 15",
+      "sai": "đinh",
+      "dung": "định",
+      "loai": "Lạc ngữ cảnh",
+      "batDau": 193,
+      "ketThuc": 197,
+      "doan": "Nội dung đầu tư gồm ( 05 ) hạng mục, tổng dự toán 36,2 tỷ đồng. Các đơn vị báo cáo trước ngày 15/12/2026.Phòng Kế hoạch-Đầu tư tổng hợp, Phòng Tài chính-Kế toán bố trí nguồn vốn, theo đúng quy đinh hiện hành."
+    },
+    {
+      "id": 23,
+      "viTri": "Mục 18",
+      "sai": "chỉ tieu",
+      "dung": "chỉ tiêu",
+      "loai": "Thiếu dấu",
+      "batDau": 50,
+      "ketThuc": 58,
+      "doan": "b) Đ/c Trần Văn Quỳnh, ThS. Lê Thị Thúy phụ trách chỉ tieu độ tin cậy cung cấp điện;"
+    },
+    {
+      "id": 24,
+      "viTri": "Mục 19",
+      "sai": "phoois",
+      "dung": "phối",
+      "loai": "Gõ Telex",
+      "batDau": 29,
+      "ketThuc": 35,
+      "doan": "c) Đội Quản lý điện Yên Dũng phoois hợp kiểm tra hành lang tuyến 22kV, liên hệ email kt.bacgiang@npc.com.vn hoặc hotline 19006769;"
+    },
+    {
+      "id": 25,
+      "viTri": "Mục 20",
+      "sai": "Nhuwngx",
+      "dung": "Những",
+      "loai": "Gõ Telex",
+      "batDau": 3,
+      "ketThuc": 10,
+      "doan": "d) Nhuwngx nội dung còn vướng mắc báo cáo về P.KT để tổng hợp;"
+    },
+    {
+      "id": 26,
+      "viTri": "Mục 21",
+      "sai": "đã đã",
+      "dung": "đã",
+      "loai": "Lặp từ",
+      "batDau": 25,
+      "ketThuc": 30,
+      "doan": "đ) Các đơn vị không được đã đã chậm trễ trong việc báo cáo."
+    },
+    {
+      "id": 27,
+      "viTri": "Mục 22",
+      "sai": "chia sẽ",
+      "dung": "chia sẻ",
+      "loai": "Cặp ngữ cảnh",
+      "batDau": 14,
+      "ketThuc": 21,
+      "doan": "Chúng tôi xin chia sẽ một số kinh nghiệm: tổ công tác đã dành được giải nhất hội thi an toàn vệ sinh viên năm 2026."
+    },
+    {
+      "id": 28,
+      "viTri": "Mục 22",
+      "sai": "dành được",
+      "dung": "giành được",
+      "loai": "Cặp ngữ cảnh",
+      "batDau": 57,
+      "ketThuc": 66,
+      "doan": "Chúng tôi xin chia sẽ một số kinh nghiệm: tổ công tác đã dành được giải nhất hội thi an toàn vệ sinh viên năm 2026."
+    }
+  ],
+  "doan": [
+    {
+      "text": "BÁO CÁO TÌNH HÌNH THỰC HIÊN KẾ HOẠCH QUÝ III NĂM 2026",
+      "viTri": "Mục 1"
+    },
+    {
+      "text": "Kính gửi: Ban Giám đốc Công ty Điện lực Bắc Giang",
+      "viTri": "Mục 2"
+    },
+    {
+      "text": "I. KẾT QUẢ THỰC HIỆN NHIỆM VỤ",
+      "viTri": "Mục 3"
+    },
+    {
+      "text": "1. Công tác sản xuất kinh doanh",
+      "viTri": "Mục 4"
+    },
+    {
+      "text": "Căn cứ Quyết định số 1825/QĐ-EVNNPC ngày 12/6/2026 của Tổng công ty Điện lực miền Bắc và điểm c khoản 3 Điều 8 Thông tư số 25/2016/TT-BCT, Công ty đã thi hàng đầy đủ các chỉ tiêu được giao. Sản lượng điện thương phẩm quý III đạt 412,6 triệu kWh, tăng 7,3% so với cùng kỳ; tổn thât điện năng đạt 4,18%, thấp hơn kế hoạch 0,12%.",
+      "viTri": "Mục 5"
+    },
+    {
+      "text": "Giá bán điện bình quân đạt 2.146,35 đ/kWh. Doanh thu ước đạt 885.000.000.000đ. Số khách hành sử dụng điện tăng thêm 4.215 hộ, đưa tổng số lên 612.450 khách hàng.",
+      "viTri": "Mục 6"
+    },
+    {
+      "text": "2. Công tác kỹ thuật và an toàn",
+      "viTri": "Mục 7"
+    },
+    {
+      "text": "Đơn vị đã vận hàng an toàn 12 trạm biến áp 110kV, 4.860 trạm biến áp phân phối và 3.215 km đường giây trung áp. Trong quý không xảy ra tai nạn lao đông. Số vụ sự cố thoáng qua giảm 11 vụ, sự cố kéo dài giảm 3 vụ so với cùng kỳ.",
+      "viTri": "Mục 8"
+    },
+    {
+      "text": "Các nhóm công tác đã thay 36 bộ recloser, 18 tủ RMU và 240 cột chiếu sáng; lắp đặt 2.150 công-tơ điện tử 3 pha; thử nghiệm định kỳ MBA T1, T2 tại TBA 110kV Đình Trám. Dây dẫn AC-120 được thay bằng cáp ngầm Cu/XLPE/PVC 3x240mm2, dòng ngắn mạch cho phép 25kA, thời gian cắt 500ms. Tụ bù trung áp 600kVAr đưa hệ số công suất cosφ lên 0,96.",
+      "viTri": "Mục 9"
+    },
+    {
+      "text": "Tuy nhiên, công tác kiểm tra hiện trường còn chưa nghiêm thu đúng hạn, một số hồ sơ phải bổ xung nhiều lần. Các đơn vị cần xắp xếp lại lịch công tác , bảo đảm đúng tiến độ.",
+      "viTri": "Mục 10"
+    },
+    {
+      "text": "Phòng Kỹ thuật hoạtt động độc lập, Phòng An toàn hoạtt động theo chuyên đề, còn các Đội Quản lý điện hoạtt động theo địa bàn.",
+      "viTri": "Mục 11"
+    },
+    {
+      "text": "Đề nghị các các đơn vị phối hợp với Sở Công Thương, Ủy ban nhân dân các cấp và bộ công thương để tháo gỡ vướng mắc. Văn bản trả lời của tập đoàn điện lực việt nam đã được chuyển về đơn vị.",
+      "viTri": "Mục 12"
+    },
+    {
+      "text": "II. KẾ HOACH SỬA CHỮA LỚN QUÝ IV",
+      "viTri": "Mục 13"
+    },
+    {
+      "text": "STT",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Hạng mục",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Khối lượng",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Ghi chú",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "1",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Thay máy biến ấp T2",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "01 máy 25MVA",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "TBA 110kV Quang Châu",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "2",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Cải tạo đường dây 35kV lộ 371",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "12,5 km",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Hoàn thành thánh 12",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "3",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Sửa chữa hệ thông tiếp địa",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "146 vị trí",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Theo quy trình QCVN",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "4",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Thay cầu dao phụ tải LBS",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "24 bộ",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Đội QLĐ Lạng Giang",
+      "viTri": "Bảng hạng mục"
+    },
+    {
+      "text": "Nội dung đầu tư gồm ( 05 ) hạng mục, tổng dự toán 36,2 tỷ đồng. Các đơn vị báo cáo trước ngày 15/12/2026.Phòng Kế hoạch-Đầu tư tổng hợp, Phòng Tài chính-Kế toán bố trí nguồn vốn, theo đúng quy đinh hiện hành.",
+      "viTri": "Mục 15"
+    },
+    {
+      "text": "III. CÁC VIỆC CẦN LÀM NGAY",
+      "viTri": "Mục 16"
+    },
+    {
+      "text": "a) Rà soát, cập nhật dữ liệu khách hàng trên phần mềm CMIS trước ngày 30/11/2026;",
+      "viTri": "Mục 17"
+    },
+    {
+      "text": "b) Đ/c Trần Văn Quỳnh, ThS. Lê Thị Thúy phụ trách chỉ tieu độ tin cậy cung cấp điện;",
+      "viTri": "Mục 18"
+    },
+    {
+      "text": "c) Đội Quản lý điện Yên Dũng phoois hợp kiểm tra hành lang tuyến 22kV, liên hệ email kt.bacgiang@npc.com.vn hoặc hotline 19006769;",
+      "viTri": "Mục 19"
+    },
+    {
+      "text": "d) Nhuwngx nội dung còn vướng mắc báo cáo về P.KT để tổng hợp;",
+      "viTri": "Mục 20"
+    },
+    {
+      "text": "đ) Các đơn vị không được đã đã chậm trễ trong việc báo cáo.",
+      "viTri": "Mục 21"
+    },
+    {
+      "text": "Chúng tôi xin chia sẽ một số kinh nghiệm: tổ công tác đã dành được giải nhất hội thi an toàn vệ sinh viên năm 2026.",
+      "viTri": "Mục 22"
+    },
+    {
+      "text": "Phòng Tổng hợp đã gửi báo cáo tháng theo mẫu mới.",
+      "viTri": "Đoạn có Track Changes"
+    },
+    {
+      "text": "C«ng ty §iÖn lùc thùc hiÖn kÕ ho¹ch s¶n xuÊt kinh doanh n¨m 2026.",
+      "viTri": "Đoạn font cũ",
+      "fontCu": true
+    },
+    {
+      "text": "Số liệu lấy theo báo cáo nhanh của Trung tâm Điều độ.",
+      "viTri": "Đoạn có chú thích"
+    },
+    {
+      "text": "Họ và tên:\tNguyễn Thị Minh Hòa",
+      "viTri": "Dòng biểu mẫu"
+    },
+    {
+      "text": "Đơn vị:    Phòng Kỹ thuật",
+      "viTri": "Dòng biểu mẫu"
+    },
+    {
+      "text": "Mục lục ......................... 5",
+      "viTri": "Dòng biểu mẫu"
+    },
+    {
+      "text": "Đánh dấu (   ) nếu đồng ý.",
+      "viTri": "Dòng biểu mẫu"
+    },
+    {
+      "text": "Nhãn hiệu Microsoft® đã đăng ký, tỷ lệ ½ công suất, bản quyền © 2026.",
+      "viTri": "Đoạn có ký hiệu"
+    },
+    {
+      "text": "Nơi nhận:",
+      "viTri": "Phần ký"
+    },
+    {
+      "text": "- Như trên;",
+      "viTri": "Phần ký"
+    },
+    {
+      "text": "- HĐTV, BKS (để b/c);",
+      "viTri": "Phần ký"
+    },
+    {
+      "text": "- Lưu: VT, KT.",
+      "viTri": "Phần ký"
+    },
+    {
+      "text": "KT. GIÁM ĐỐC",
+      "viTri": "Phần ký"
+    },
+    {
+      "text": "PHÓ GIÁM ĐỐC",
+      "viTri": "Phần ký"
+    },
+    {
+      "text": "Vũ Hải Đăng",
+      "viTri": "Phần ký"
+    }
+  ]
+}

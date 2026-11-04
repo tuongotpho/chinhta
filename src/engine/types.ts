@@ -1,6 +1,6 @@
 export type Severity = 'chac-chan' | 'nen-xem' | 'goi-y';
 
-export type RuleCode = 'R1' | 'R2' | 'R3' | 'R4' | 'R5' | 'R6' | 'R7';
+export type RuleCode = 'R1' | 'R2' | 'R3' | 'R4' | 'R5' | 'R6' | 'R7' | 'R8';
 
 export interface SpellError {
   /** Mã luật vi phạm (R1 - R7) */
@@ -27,6 +27,8 @@ export interface CheckOptions {
   enableR5?: boolean; // Lặp từ liền nhau (mặc định: true)
   enableR6?: boolean; // Viết hoa tên cơ quan Nghị định 30 (mặc định: true)
   enableR7?: boolean; // Thống nhất kiểu dấu hoà/hòa (mặc định: false)
+  enableR8?: boolean; // Lạc ngữ cảnh theo tần suất cặp âm tiết (mặc định: true, cần mô hình n-gram)
+  r8Threshold?: number; // Ngưỡng R8, chỉ dùng khi đánh giá
   userDictionary?: string[]; // Từ điển người dùng cá nhân thêm vào
   ignoreRules?: RuleCode[]; // Danh sách luật bỏ qua
 }

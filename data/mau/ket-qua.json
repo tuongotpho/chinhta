@@ -1,0 +1,157 @@
+{
+  "detail": {
+    "1": {
+      "luat": "R8",
+      "goiY": [
+        "HIỆN"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "2": {
+      "luat": "R8",
+      "goiY": [
+        "hành"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "3": {
+      "luat": "R1",
+      "goiY": [
+        "thất",
+        "thật",
+        "thắt"
+      ],
+      "mucDo": "chac-chan"
+    },
+    "8": {
+      "luat": "R8",
+      "goiY": [
+        "động"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "10": {
+      "luat": "R2",
+      "goiY": [
+        "bổ sung"
+      ],
+      "mucDo": "chac-chan"
+    },
+    "11": {
+      "luat": "R2",
+      "goiY": [
+        "sắp xếp"
+      ],
+      "mucDo": "chac-chan"
+    },
+    "12": {
+      "luat": "R4",
+      "goiY": [
+        ","
+      ],
+      "mucDo": "chac-chan"
+    },
+    "13": {
+      "luat": "R1",
+      "goiY": [
+        "hoạt"
+      ],
+      "mucDo": "chac-chan"
+    },
+    "14": {
+      "luat": "R1",
+      "goiY": [
+        "hoạt"
+      ],
+      "mucDo": "chac-chan"
+    },
+    "15": {
+      "luat": "R1",
+      "goiY": [
+        "hoạt"
+      ],
+      "mucDo": "chac-chan"
+    },
+    "16": {
+      "luat": "R5",
+      "goiY": [
+        "các"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "17": {
+      "luat": "R6",
+      "goiY": [
+        "Bộ Công Thương"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "18": {
+      "luat": "R6",
+      "goiY": [
+        "Tập đoàn Điện lực Việt Nam"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "19": {
+      "luat": "R1",
+      "goiY": [
+        "HOẠCH"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "20": {
+      "luat": "R4",
+      "goiY": [
+        "(0"
+      ],
+      "mucDo": "chac-chan"
+    },
+    "22": {
+      "luat": "R8",
+      "goiY": [
+        "định"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "23": {
+      "luat": "R1",
+      "goiY": [
+        "tiêu",
+        "tiểu",
+        "tiều"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "24": {
+      "luat": "R1",
+      "goiY": [
+        "phối",
+        "phới"
+      ],
+      "mucDo": "chac-chan"
+    },
+    "26": {
+      "luat": "R5",
+      "goiY": [
+        "đã"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "27": {
+      "luat": "R3",
+      "goiY": [
+        "chia sẻ"
+      ],
+      "mucDo": "nen-xem"
+    },
+    "28": {
+      "luat": "R3",
+      "goiY": [
+        "giành được"
+      ],
+      "mucDo": "nen-xem"
+    }
+  },
+  "falseAlarms": []
+}

@@ -302,17 +302,17 @@
   },
   {
     "id": "R2-9",
-    "cau": "Hạ tầng đường xá nông thôn được nâng cấp. (Mục 9)",
+    "cau": "Công trình đã được bàn giao và đưa vào xử dụng. (Mục 9)",
     "coLoi": true,
     "loaiLoi": "R2",
-    "tuLoi": "đường xá"
+    "tuLoi": "xử dụng"
   },
   {
     "id": "R2-10",
-    "cau": "Khu vực phố sá đông đúc người qua lại. (Mục 10)",
+    "cau": "Công ty xin chân trọng cảm ơn quý đối tác. (Mục 10)",
     "coLoi": true,
     "loaiLoi": "R2",
-    "tuLoi": "phố sá"
+    "tuLoi": "chân trọng"
   },
   {
     "id": "R2-11",
@@ -442,17 +442,17 @@
   },
   {
     "id": "R2-29",
-    "cau": "Hạ tầng đường xá nông thôn được nâng cấp. (Mục 29)",
+    "cau": "Công trình đã được bàn giao và đưa vào xử dụng. (Mục 29)",
     "coLoi": true,
     "loaiLoi": "R2",
-    "tuLoi": "đường xá"
+    "tuLoi": "xử dụng"
   },
   {
     "id": "R2-30",
-    "cau": "Khu vực phố sá đông đúc người qua lại. (Mục 30)",
+    "cau": "Công ty xin chân trọng cảm ơn quý đối tác. (Mục 30)",
     "coLoi": true,
     "loaiLoi": "R2",
-    "tuLoi": "phố sá"
+    "tuLoi": "chân trọng"
   },
   {
     "id": "R2-31",
