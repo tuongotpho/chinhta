@@ -21,7 +21,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const half = process.argv[2] === 'test' ? 'test' : 'dev';
 const thresholds = (process.argv[3] ?? '8').split(',').map(Number);
 
-const raw = fs.readFileSync(path.join(root, 'public/assets/ngram-v1.bin'));
+const raw = fs.readFileSync(path.join(root, 'public/assets/ngram-v2.bin'));
 setNgramModel(parseNgramModel(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer));
 
 const rows = fs

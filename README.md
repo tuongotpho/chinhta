@@ -87,4 +87,6 @@ npm run build
 ## 📄 Bản Quyền & Liên Hệ
 
 **(C) August87 - 0982722036**  
-Mã nguồn phục vụ triển khai nội bộ, bảo vệ an toàn thông tin dữ liệu văn bản.
+Phát hành theo giấy phép **GNU GPL phiên bản 3 trở lên**, toàn văn ở tệp [LICENSE](LICENSE).
+
+Dữ liệu dùng các nguồn mở: Wikipedia, Wikisource, Wikibooks, Wiktionary (CC BY-SA 4.0), Kaikki trích từ Wiktionary, Viet74K của Hồ Ngọc Đức (GPL). Chi tiết ở [data/NGUON-DU-LIEU.md](data/NGUON-DU-LIEU.md).

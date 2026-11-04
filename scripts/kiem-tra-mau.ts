@@ -19,7 +19,7 @@ interface Planted {
 }
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const raw = fs.readFileSync(path.join(root, 'public/assets/ngram-v1.bin'));
+const raw = fs.readFileSync(path.join(root, 'public/assets/ngram-v2.bin'));
 setNgramModel(parseNgramModel(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer));
 
 const { loi, doan } = JSON.parse(fs.readFileSync(path.join(root, 'data/mau/dap-an.json'), 'utf8')) as {

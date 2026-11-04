@@ -20,7 +20,7 @@ const SPEED_PAGES = 20;
 const SPEED_LIMIT_MS = 5000;
 const RECALL_TARGET = 90;
 
-const model = fs.readFileSync(path.join(__dirname, '../public/assets/ngram-v1.bin'));
+const model = fs.readFileSync(path.join(__dirname, '../public/assets/ngram-v2.bin'));
 setNgramModel(parseNgramModel(model.buffer.slice(model.byteOffset, model.byteOffset + model.byteLength) as ArrayBuffer));
 
 const samples: Sample[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/test-samples.json'), 'utf8'));
