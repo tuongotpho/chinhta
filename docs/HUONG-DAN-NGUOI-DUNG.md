@@ -43,6 +43,16 @@ Add-in phân loại lỗi thành 3 nhóm rõ ràng:
 
 > Add-in không dùng AI. Luật ngữ cảnh R8 dựa trên tần suất cặp âm tiết nên chỉ ở mức **Nên xem**: bạn phải đọc và tự quyết định. Add-in không thay được người đọc lại.
 
+### Soát trình bày
+Sau khi quét, thẻ **Trình bày** liệt kê các chỗ cần xem:
+- **Đoạn chưa căn đều:** đoạn văn dài đang căn trái.
+- **Dòng bị giãn:** đoạn căn đều có Shift+Enter làm dòng trên kéo giãn chữ. Khi sửa, chỗ hết câu thành xuống đoạn, chỗ giữa câu thành dấu cách.
+- **Dấu cách ở đầu dòng:** sửa từng mục, vì trong biểu mẫu có thể đang chừa chỗ cho ô tích.
+- **Căn lề bằng dấu cách hoặc tab:** chỉ báo, không tự sửa, vì đây thường là phần chữ ký hoặc biểu mẫu.
+- **Khác font hoặc cỡ chữ:** đưa về font và cỡ chiếm đa số trong văn bản. Chỉ xét khi Quét toàn bộ.
+
+Bảng, tiêu đề, đoạn căn giữa và dòng viết hoa không bị báo. Nút **Sửa hàng loạt** sửa các mục an toàn, bấm Ctrl+Z nhiều lần nếu muốn hoàn tác.
+
 ### Văn bản dùng font cũ (.VnTime, TCVN3, VNI)
 - Khi quét, add-in báo các đoạn dùng font cũ và chưa soát lỗi các đoạn đó.
 - Bấm **Đổi sang Unicode**, đọc hộp xác nhận rồi bấm **Đồng ý đổi**. Add-in đổi chữ và font, giữ đậm, nghiêng, cỡ chữ, kể cả chữ trong bảng, rồi tự quét lại.
