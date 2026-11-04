@@ -20,7 +20,7 @@ export const Footer: React.FC = () => {
   return (
     <footer className={styles.footer}>
       <Text size={100} weight="semibold">
-        (C) August87 - 0982722036
+        Phiên bản {__APP_VERSION__} ({__APP_BUILD_DATE__}) · (C) August87 - 0982722036
       </Text>
     </footer>
   );
