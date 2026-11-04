@@ -1,0 +1,32 @@
+[
+  {
+    "sai": "dành giải",
+    "dung": "giành giải",
+    "nguCanh": ["giải", "giải nhất", "giải nhì", "giải ba", "huy chương", "thắng lợi"],
+    "lyDo": "Trong ngữ cảnh đạt được phần thưởng/thắng lợi, dùng 'giành' thay vì 'dành'"
+  },
+  {
+    "sai": "giành cho",
+    "dung": "dành cho",
+    "nguCanh": ["cho", "tặng", "riêng"],
+    "lyDo": "Trong ngữ cảnh cất giữ, để lại hoặc hướng tới đối tượng, dùng 'dành cho' thay vì 'giành cho'"
+  },
+  {
+    "sai": "giành tình cảm",
+    "dung": "dành tình cảm",
+    "nguCanh": ["tình cảm", "sự quan tâm", "thời gian"],
+    "lyDo": "Trong ngữ cảnh trao tặng tình cảm, thời gian, dùng 'dành' thay vì 'giành'"
+  },
+  {
+    "sai": "dành quyền",
+    "dung": "giành quyền",
+    "nguCanh": ["quyền", "quyền kiểm soát", "quyền ưu tiên", "chính quyền"],
+    "lyDo": "Trong ngữ cảnh tranh đấu để đạt được quyền lực/ưu tiên, dùng 'giành quyền'"
+  },
+  {
+    "sai": "chia sẽ",
+    "dung": "chia sẻ",
+    "nguCanh": ["chia sẽ"],
+    "lyDo": "Động từ san sẻ, chia sẻ viết dấu hỏi 'chia sẻ' (trừ trường hợp tên riêng như Nguyễn Văn Chia sẽ...)"
+  }
+]

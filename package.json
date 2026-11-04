@@ -1,0 +1,35 @@
+{
+  "name": "soat-chinh-ta-word-addin",
+  "version": "1.0.0",
+  "description": "Add-in Word soát lỗi chính tả tiếng Việt nội bộ (không AI) bảo vệ dữ liệu văn bản",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate-manifest": "office-addin-manifest validate manifest.xml",
+    "do-chinh-ta": "tsx scripts/do-chinh-ta.ts"
+  },
+  "dependencies": {
+    "@fluentui/react-components": "^9.57.0",
+    "@fluentui/react-icons": "^2.0.260",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/office-js": "^1.0.427",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "office-addin-manifest": "^3.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "vitest": "^2.1.8"
+  }
+}

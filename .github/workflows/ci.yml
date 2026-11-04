@@ -1,0 +1,39 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Cài đặt dependencies
+        run: npm ci
+
+      - name: Kiểm tra kiểu TypeScript (Typecheck)
+        run: npx tsc --noEmit
+
+      - name: Chạy kiểm thử tự động (Vitest)
+        run: npm test
+
+      - name: Chạy bộ đo chất lượng 200 câu (Benchmark)
+        run: npm run do-chinh-ta
+
+      - name: Kiểm tra tính hợp lệ của Manifest XML
+        run: npm run validate-manifest
+
+      - name: Đóng gói dự án (Vite Build)
+        run: npm run build

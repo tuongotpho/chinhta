@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" 
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" 
+           xsi:type="TaskPaneApp">
+  <Id>0d864eeb-0939-4159-8800-21a3426119d2</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>August87</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Soát Chính Tả" />
+  <Description DefaultValue="Add-in soát chính tả tiếng Việt nội bộ bảo vệ dữ liệu văn bản" />
+  <IconUrl DefaultValue="https://soatchinhta-addin.web.app/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://soatchinhta-addin.web.app/assets/icon-80.png" />
+  <SupportUrl DefaultValue="https://soatchinhta-addin.web.app/support.html" />
+  <AppDomains>
+    <AppDomain>https://soatchinhta-addin.web.app</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Document" />
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://soatchinhta-addin.web.app/index.html" />
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <FunctionFile resid="Taskpane.Url" />
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <CustomTab id="August87.CustomTab">
+              <Group id="August87.TabGroup1">
+                <Label resid="Group.Label" />
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16" />
+                  <bt:Image size="32" resid="Icon.32" />
+                  <bt:Image size="80" resid="Icon.80" />
+                </Icon>
+                <Control xsi:type="Button" id="August87.TaskpaneBtn">
+                  <Label resid="Button.Label" />
+                  <Supertip>
+                    <Title resid="Button.Label" />
+                    <Description resid="Button.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16" />
+                    <bt:Image size="32" resid="Icon.32" />
+                    <bt:Image size="80" resid="Icon.80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>August87TaskpaneId</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+              <Label resid="CustomTab.Label" />
+            </CustomTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://soatchinhta-addin.web.app/assets/icon-16.png" />
+        <bt:Image id="Icon.32" DefaultValue="https://soatchinhta-addin.web.app/assets/icon-32.png" />
+        <bt:Image id="Icon.80" DefaultValue="https://soatchinhta-addin.web.app/assets/icon-80.png" />
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://soatchinhta-addin.web.app/index.html" />
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="CustomTab.Label" DefaultValue="Chính Tả" />
+        <bt:String id="Group.Label" DefaultValue="Kiểm Tra" />
+        <bt:String id="Button.Label" DefaultValue="Soát Chính Tả" />
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="Button.Tooltip" DefaultValue="Mở thanh công cụ soát chính tả tiếng Việt nội bộ" />
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
