@@ -12,13 +12,15 @@ import { DisplayErrorItem } from '../hooks/useChecker';
 import { ErrorCard } from './ErrorCard';
 
 const useStyles = makeStyles({
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    ...shorthands.gap('8px')
+  stickyTabs: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 1,
+    ...shorthands.padding('6px', '0'),
+    backgroundColor: tokens.colorNeutralBackground1
   },
   tabList: {
-    marginBottom: '8px'
+    flexWrap: 'wrap'
   },
   emptyState: {
     display: 'flex',
@@ -86,18 +88,20 @@ export const ErrorList: React.FC<ErrorListProps> = ({
   }
 
   return (
-    <div className={styles.container}>
-      <TabList
-        className={styles.tabList}
-        selectedValue={activeTab}
-        onTabSelect={(_, data) => setActiveTab(data.value as typeof activeTab)}
-        size="small"
-      >
-        <Tab value="all">Tất cả ({items.length})</Tab>
-        <Tab value="chac-chan">Chắc chắn ({countSure})</Tab>
-        <Tab value="nen-xem">Nên xem ({countReview})</Tab>
-        {countSuggestion > 0 && <Tab value="goi-y">Gợi ý ({countSuggestion})</Tab>}
-      </TabList>
+    <>
+      <div className={styles.stickyTabs}>
+        <TabList
+          className={styles.tabList}
+          selectedValue={activeTab}
+          onTabSelect={(_, data) => setActiveTab(data.value as typeof activeTab)}
+          size="small"
+        >
+          <Tab value="all">Tất cả ({items.length})</Tab>
+          <Tab value="chac-chan">Chắc chắn ({countSure})</Tab>
+          <Tab value="nen-xem">Nên xem ({countReview})</Tab>
+          {countSuggestion > 0 && <Tab value="goi-y">Gợi ý ({countSuggestion})</Tab>}
+        </TabList>
+      </div>
 
       <div>
         {filteredItems.map(item => (
@@ -112,6 +116,6 @@ export const ErrorList: React.FC<ErrorListProps> = ({
           />
         ))}
       </div>
-    </div>
+    </>
   );
 };
