@@ -16,9 +16,12 @@ function buildBoundaryRegex(phrase: string): RegExp {
 }
 
 // Biên dịch trước các regex cho danh sách cụm từ nhầm lẫn đã kiểm duyệt
-const COMPILED_R2: { regex: RegExp; pair: ConfusionPair }[] = CUM_TU_NHAM_LAN.map(pair => ({
+const COMPILED_R2: { regex: RegExp; pair: ConfusionPair; exception: RegExp | null }[] = CUM_TU_NHAM_LAN.map(pair => ({
   regex: buildBoundaryRegex(pair.sai),
-  pair
+  pair,
+  exception: pair.khongDungTruoc
+    ? new RegExp(`^[ \\u00A0]+(?:${pair.khongDungTruoc})(?![\\p{L}\\p{N}])`, 'iu')
+    : null
 }));
 
 /**
@@ -32,7 +35,7 @@ export function checkR2Confusion(
   const errors: SpellError[] = [];
   const userDict = new Set((options?.userDictionary || []).map(w => w.toLowerCase().normalize('NFC')));
 
-  for (const { regex, pair } of COMPILED_R2) {
+  for (const { regex, pair, exception } of COMPILED_R2) {
     regex.lastIndex = 0;
     let match: RegExpExecArray | null;
 
@@ -40,6 +43,9 @@ export function checkR2Confusion(
       const matchText = match[0];
       const start = match.index;
       const end = start + matchText.length;
+
+      // Cụm trùng hình thức với chữ đúng: "tiếp xúc tích cực", "nhận chức vụ"
+      if (exception?.test(normalizedText.slice(end, end + 24))) continue;
 
       // Nếu từ này đã được người dùng thêm vào từ điển cá nhân thì bỏ qua
       if (userDict.has(matchText.toLowerCase())) continue;

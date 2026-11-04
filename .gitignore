@@ -36,3 +36,18 @@ docs/van-ban-that/
 data/van-ban-that/
 temp/
 scratch/
+
+# Kịch bản bóc tách và tài liệu dựa trên app thương mại: không đưa lên kho công khai
+scripts/extract-cab.js
+scripts/extract-cab2.js
+scripts/find-mscf.js
+scripts/inspect-apps.js
+scripts/inspect-parent.js
+scripts/read-help.js
+scripts/read-help-utf16.js
+scripts/read-mdb.ps1
+scripts/scan-*.js
+03-BAO-CAO-KY-THUAT-CAP-NHAT-TINH-NANG-VA-PHUONG-PHAP-CHECK.md
+
+# Dữ liệu tải về để đánh giá (VSEC, từ điển ngoài)
+data/ngoai/

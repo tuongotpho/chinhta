@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "soatchinhta",
     "public": "dist",
     "ignore": [
       "firebase.json",

@@ -11,6 +11,10 @@ function buildBoundaryRegex(phrase: string): RegExp {
   return new RegExp(`${pre}${escaped}${post}`, 'giu');
 }
 
+// Dùng theo nghĩa chung thì viết thường: "nhiều chính phủ", "ủy ban nhân dân các cấp"
+const GENERIC_BEFORE = /(?:^|[\s(])(?:các|những|nhiều|mọi|mỗi|một|hai|ba)[  ]+$/iu;
+const GENERIC_AFTER = /^[  ]+(?:các cấp|các nước|nước ngoài|trên thế giới)(?![\p{L}\p{N}])/iu;
+
 const COMPILED_R6: { regex: RegExp; entry: AgencyEntry }[] = CO_QUAN_ND30.map(entry => ({
   regex: buildBoundaryRegex(entry.chuan),
   entry
@@ -48,6 +52,15 @@ export function checkR6Organization(
       // 2. Nếu viết in hoa toàn bộ (ví dụ tiêu đề "BỘ TÀI CHÍNH") -> BỎ QUA
       if (matchText === entry.chuan.toUpperCase()) {
         continue;
+      }
+
+      // 3. Dùng theo nghĩa chung, không phải tên riêng của một cơ quan
+      if (
+        matchText === matchText.toLowerCase() || matchText[0] === entry.chuan[0]
+      ) {
+        const before = normalizedText.slice(Math.max(0, start - 16), start);
+        const after = normalizedText.slice(end, end + 24);
+        if (GENERIC_BEFORE.test(before) || GENERIC_AFTER.test(after)) continue;
       }
 
       // Bỏ qua nếu có trong từ điển cá nhân người dùng

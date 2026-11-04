@@ -116,14 +116,16 @@ export const ErrorCard: React.FC<ErrorCardProps> = ({
       )}
 
       <div className={styles.actionRow}>
-        <Button
-          size="small"
-          appearance="primary"
-          icon={<CheckmarkRegular />}
-          onClick={() => onFix(selectedSuggestion)}
-        >
-          Sửa
-        </Button>
+        {error.goiY.length > 0 && (
+          <Button
+            size="small"
+            appearance="primary"
+            icon={<CheckmarkRegular />}
+            onClick={() => onFix(selectedSuggestion)}
+          >
+            Sửa
+          </Button>
+        )}
 
         <Button
           size="small"

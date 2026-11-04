@@ -1,13 +1,24 @@
 import { SpellError, CheckOptions } from '../types';
 import { Sentence } from '../tokenizer';
+import { bigramCount, unigramCount } from '../ngram';
 
 // Danh sách các từ láy hoặc điệp từ hợp lệ trong tiếng Việt (không báo lỗi lặp)
 const VALID_REDUPLICATIONS = new Set<string>([
   'ngày ngày', 'người người', 'nhà nhà', 'năm năm', 'ai ai', 'ngay ngay',
   'xinh xinh', 'xanh xanh', 'đo đỏ', 'chậm chậm', 'nhanh nhanh', 'đều đều',
   'lớp lớp', 'tầng tầng', 'trùng trùng', 'điệp điệp', 'nhiều nhiều', 'ít ít',
-  'trước trước', 'sau sau', 'dần dần', 'luôn luôn', 'sớm sớm', 'chiều chiều'
+  'trước trước', 'sau sau', 'dần dần', 'luôn luôn', 'sớm sớm', 'chiều chiều',
+  'từ từ', 'song song', 'chung chung', 'mãi mãi', 'ào ào', 'đời đời', 'thường thường',
+  'đâu đâu', 'rất rất', 'xa xa', 'cao cao', 'vàng vàng', 'buồn buồn', 'thỉnh thoảng'
 ]);
+
+/** Lặp từ phổ biến trong kho ngữ liệu thì coi là từ láy, không phải gõ thừa */
+const COMMON_REDUPLICATION_RATIO = 0.001;
+
+function isCommonReduplication(word: string): boolean {
+  const total = unigramCount(word);
+  return total > 0 && bigramCount(word, word) / total >= COMMON_REDUPLICATION_RATIO;
+}
 
 /**
  * Luật R5: Lặp từ liền nhau (Mức: Nên xem)
@@ -45,6 +56,7 @@ export function checkR5Repetition(
         // Bỏ qua nếu là từ láy/điệp từ tiếng Việt hợp lệ hoặc trong từ điển
         if (VALID_REDUPLICATIONS.has(pairKey)) continue;
         if (userDict.has(pairKey)) continue;
+        if (isCommonReduplication(lowerCurrent)) continue;
 
         const start = current.start;
         const end = next.end;

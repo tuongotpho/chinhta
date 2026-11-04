@@ -60,6 +60,8 @@ Xoá thư mục: `rmdir /s /q "%USERPROFILE%\SoatChinhTa"`
 
 ## 4. Biên Bản Kiểm Thử Trên Các Phiên Bản Word
 
+> Bảng dưới đây chưa có ảnh chụp hay số phiên bản được xác minh, cần coi là chưa kiểm chứng cho đến khi thử lại trên máy thật.
+
 | Thiết bị / Môi trường | Phiên bản Word | Kết quả hiển thị Ribbon | Cảnh báo bảo mật | Đọc đoạn văn | Ghi chú |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Máy văn phòng Win 10** | Word 2019 (16.0.10396) | Hiện tab 'Chính Tả' | Không có | Đạt | Đọc & tương tác mượt mà |

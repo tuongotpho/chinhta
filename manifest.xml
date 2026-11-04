@@ -5,22 +5,22 @@
            xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" 
            xsi:type="TaskPaneApp">
   <Id>0d864eeb-0939-4159-8800-21a3426119d2</Id>
-  <Version>1.0.0.0</Version>
+  <Version>1.0.1.0</Version>
   <ProviderName>August87</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Soát Chính Tả" />
   <Description DefaultValue="Add-in soát chính tả tiếng Việt nội bộ bảo vệ dữ liệu văn bản" />
-  <IconUrl DefaultValue="https://soatchinhta-addin.web.app/assets/icon-32.png" />
-  <HighResolutionIconUrl DefaultValue="https://soatchinhta-addin.web.app/assets/icon-80.png" />
-  <SupportUrl DefaultValue="https://soatchinhta-addin.web.app/support.html" />
+  <IconUrl DefaultValue="https://soatchinhta.web.app/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://soatchinhta.web.app/assets/icon-80.png" />
+  <SupportUrl DefaultValue="https://soatchinhta.web.app/support.html" />
   <AppDomains>
-    <AppDomain>https://soatchinhta-addin.web.app</AppDomain>
+    <AppDomain>https://soatchinhta.web.app</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Document" />
   </Hosts>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://soatchinhta-addin.web.app/index.html" />
+    <SourceLocation DefaultValue="https://soatchinhta.web.app/index.html" />
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
@@ -62,12 +62,12 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16" DefaultValue="https://soatchinhta-addin.web.app/assets/icon-16.png" />
-        <bt:Image id="Icon.32" DefaultValue="https://soatchinhta-addin.web.app/assets/icon-32.png" />
-        <bt:Image id="Icon.80" DefaultValue="https://soatchinhta-addin.web.app/assets/icon-80.png" />
+        <bt:Image id="Icon.16" DefaultValue="https://soatchinhta.web.app/assets/icon-16.png" />
+        <bt:Image id="Icon.32" DefaultValue="https://soatchinhta.web.app/assets/icon-32.png" />
+        <bt:Image id="Icon.80" DefaultValue="https://soatchinhta.web.app/assets/icon-80.png" />
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://soatchinhta-addin.web.app/index.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://soatchinhta.web.app/index.html" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="CustomTab.Label" DefaultValue="Chính Tả" />

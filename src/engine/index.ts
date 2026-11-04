@@ -9,3 +9,5 @@ export * from './rules/r4-typography';
 export * from './rules/r5-repetition';
 export * from './rules/r6-organization';
 export * from './rules/r7-tone-style';
+export * from './rules/r8-context-ngram';
+export * from './ngram';

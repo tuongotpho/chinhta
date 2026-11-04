@@ -49,7 +49,7 @@ export const BatchFixModal: React.FC<BatchFixModalProps> = ({
           <DialogTitle>Xác nhận sửa hàng loạt lỗi</DialogTitle>
           <DialogContent>
             <Text block>
-              Bạn có chắc chắn muốn tự động sửa <strong>{count}</strong> lỗi ở mức <strong>Chắc chắn</strong>?
+              Tự động sửa <strong>{count}</strong> lỗi ở mức <strong>Chắc chắn</strong> có đúng một cách sửa? Các lỗi có nhiều gợi ý hoặc không có gợi ý cần bạn tự chọn.
             </Text>
             <div className={styles.listContainer}>
               <Text size={200} block>

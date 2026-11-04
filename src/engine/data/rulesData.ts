@@ -6,6 +6,8 @@ export interface ConfusionPair {
   sai: string;
   dung: string;
   lyDo: string;
+  /** Không báo nếu chữ ngay sau khớp mẫu này: "xúc tích cực" là "tiếp xúc tích cực" */
+  khongDungTruoc?: string;
 }
 
 export interface ContextPair {

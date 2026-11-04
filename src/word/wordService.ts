@@ -1,6 +1,13 @@
-import { ParagraphInfo, WordScanResult, WordErrorLocation } from './types';
+import { BatchResult, FixStatus, ParagraphInfo, WordScanResult, WordErrorLocation } from './types';
 import { detectOldFont } from './fontDetector';
 import { SpellError } from '../engine/types';
+
+// Mọi quan hệ có phần chung với vùng chọn. Bỏ sót quan hệ nào là đoạn đó bị quét thiếu mà không báo.
+const SELECTED_RELATIONS = new Set<string>([
+  'Equal', 'Inside', 'InsideStart', 'InsideEnd',
+  'Contains', 'ContainsStart', 'ContainsEnd',
+  'OverlapsBefore', 'OverlapsAfter'
+]);
 
 /**
  * Lớp WordService đóng gói toàn bộ tương tác với Microsoft Word qua Office.js (Word.run).
@@ -35,7 +42,12 @@ export class WordService {
   }
 
   /**
-   * Đọc nội dung văn bản (toàn bộ tài liệu hoặc vùng chọn hiện tại)
+   * Đọc nội dung văn bản (toàn bộ tài liệu hoặc vùng chọn hiện tại).
+   * 
+   * ĐẢM BẢO AN TOÀN:
+   * Cho dù quét vùng chọn (selection) hay toàn bộ tài liệu (all),
+   * chỉ số `index` trả về cho mỗi đoạn văn LUÔN LÀ chỉ số tuyệt đối trong
+   * `context.document.body.paragraphs`, tránh tình trạng sửa nhầm đoạn khi quét vùng chọn.
    */
   public static async readDocument(scope: 'all' | 'selection' = 'all'): Promise<WordScanResult> {
     if (!this.isWordAvailable()) {
@@ -45,18 +57,21 @@ export class WordService {
           {
             index: 0,
             text: 'Công ty xản xuất và xắp xếp lại lịch làm việc trân thành.',
+            hasTrackedChanges: false,
             isOldFont: false,
             locationType: 'body'
           },
           {
             index: 1,
             text: 'Đội tuyển đã dành giải nhất cuộc thi năm nay.',
+            hasTrackedChanges: false,
             isOldFont: false,
             locationType: 'body'
           },
           {
             index: 2,
             text: 'Vấn đề nằm trong trong báo cáo bộ tài chính .',
+            hasTrackedChanges: false,
             isOldFont: false,
             locationType: 'body'
           }
@@ -68,44 +83,57 @@ export class WordService {
     }
 
     return await window.Word.run(async (context) => {
-      let paragraphs: Word.ParagraphCollection;
+      const bodyParagraphs = context.document.body.paragraphs;
+      bodyParagraphs.load(['text', 'font/name']);
 
+      let selection: Word.Range | null = null;
       if (scope === 'selection') {
-        const selection = context.document.getSelection();
-        paragraphs = selection.paragraphs;
-      } else {
-        paragraphs = context.document.body.paragraphs;
+        selection = context.document.getSelection();
+        selection.load('text');
       }
 
-      // Tải text và font của từng đoạn văn
-      paragraphs.load(['text', 'font/name']);
+      await context.sync();
+
+      // Quyết định đoạn nào cần đọc
+      let wanted: number[] = [];
+      for (let i = 0; i < bodyParagraphs.items.length; i++) {
+        const text = bodyParagraphs.items[i].text;
+        if (text && text.trim()) wanted.push(i);
+      }
+
+      if (scope === 'selection' && selection) {
+        const comparisons = wanted.map(index => ({
+          index,
+          cmp: bodyParagraphs.items[index].getRange().compareLocationWith(selection!)
+        }));
+        await context.sync();
+        wanted = comparisons.filter(item => SELECTED_RELATIONS.has(item.cmp.value)).map(item => item.index);
+      }
+
+      const reviewed = this.loadReviewedText(wanted.map(index => bodyParagraphs.items[index]));
       await context.sync();
 
       const resultParagraphs: ParagraphInfo[] = [];
       let oldFontCount = 0;
 
-      for (let i = 0; i < paragraphs.items.length; i++) {
-        const p = paragraphs.items[i];
-        const text = p.text;
-
-        // Bỏ qua đoạn rỗng
-        if (!text || !text.trim()) continue;
-
-        const fontName = p.font?.name;
+      wanted.forEach((index, position) => {
+        const paragraph = bodyParagraphs.items[index];
+        const raw = paragraph.text;
+        const text = reviewed ? reviewed[position].value : raw;
+        const fontName = paragraph.font?.name;
         const fontCheck = detectOldFont(fontName, text);
-
-        if (fontCheck.isOldFont) {
-          oldFontCount++;
-        }
+        if (fontCheck.isOldFont) oldFontCount++;
+        if (!text.trim()) return;
 
         resultParagraphs.push({
-          index: i,
+          index, // Luôn là chỉ số thực tế trong body
           text,
+          hasTrackedChanges: text !== raw,
           isOldFont: fontCheck.isOldFont,
           fontName,
           locationType: 'body'
         });
-      }
+      });
 
       return {
         paragraphs: resultParagraphs,
@@ -116,151 +144,173 @@ export class WordService {
     });
   }
 
-  /**
-   * Đánh dấu và chọn (Select) lỗi trong văn bản Word để người dùng quan sát
-   */
-  public static async selectError(
-    paragraphIndex: number,
-    error: SpellError
-  ): Promise<boolean> {
-    if (!this.isWordAvailable()) {
-      console.log(`[Mock Word] Selected error '${error.goc}' in paragraph ${paragraphIndex}`);
-      return true;
-    }
+  /** Đọc lại một đoạn sau khi sửa để lấy nội dung và vị trí mới */
+  public static async readParagraph(paragraphIndex: number): Promise<ParagraphInfo | null> {
+    if (!this.isWordAvailable()) return null;
 
     return await window.Word.run(async (context) => {
       const paragraphs = context.document.body.paragraphs;
-      paragraphs.load('items');
+      paragraphs.load(['text', 'font/name']);
       await context.sync();
 
-      if (paragraphIndex >= paragraphs.items.length) return false;
+      const paragraph = paragraphs.items[paragraphIndex];
+      if (!paragraph) return null;
 
-      const p = paragraphs.items[paragraphIndex];
-      // Tìm từ lỗi trong đoạn
-      const searchResults = p.search(error.goc, { matchCase: true, matchWholeWord: false });
-      searchResults.load('items');
+      const reviewed = this.loadReviewedText([paragraph]);
       await context.sync();
 
-      if (searchResults.items.length === 0) return false;
-
-      // Xác định lần xuất hiện đúng vị trí tương đối
-      const targetRange = this.findMatchingRange(p.text, error.goc, error.batDau, searchResults.items);
-      if (targetRange) {
-        targetRange.select();
-        await context.sync();
-        return true;
-      }
-
-      // Mặc định chọn kết quả đầu tiên nếu không so khớp được offset
-      searchResults.items[0].select();
-      await context.sync();
-      return true;
+      const raw = paragraph.text;
+      const text = reviewed ? reviewed[0].value : raw;
+      const fontName = paragraph.font?.name;
+      return {
+        index: paragraphIndex,
+        text,
+        hasTrackedChanges: text !== raw,
+        isOldFont: detectOldFont(fontName, text).isOldFont,
+        fontName,
+        locationType: 'body'
+      };
     });
   }
 
   /**
-   * Thay thế một lỗi chính tả bằng từ gợi ý được chọn
+   * Đánh dấu và chọn lỗi trong Word. Đoạn đã đổi hoặc không định vị được đúng chỗ thì không chọn gì.
+   */
+  public static async selectError(
+    paragraphIndex: number,
+    error: SpellError,
+    expectedText: string
+  ): Promise<FixStatus> {
+    if (!this.isWordAvailable()) {
+      console.log(`[Mock Word] Selected error '${error.goc}' in paragraph ${paragraphIndex}`);
+      return 'ok';
+    }
+
+    return await window.Word.run(async (context) => {
+      const located = await this.locate(context, paragraphIndex, error, expectedText);
+      if (typeof located === 'string') return located;
+      located.select();
+      await context.sync();
+      return 'ok' as FixStatus;
+    });
+  }
+
+  /**
+   * Thay thế một lỗi bằng gợi ý được chọn. Chỉ ghi khi đoạn văn còn đúng như lúc quét.
+   * Track Changes đang bật thì Word tự ghi nhận thành sửa đổi theo dõi.
    */
   public static async replaceError(
     paragraphIndex: number,
     error: SpellError,
-    suggestion: string
-  ): Promise<boolean> {
+    suggestion: string,
+    expectedText: string
+  ): Promise<FixStatus> {
     if (!this.isWordAvailable()) {
       console.log(`[Mock Word] Replaced '${error.goc}' -> '${suggestion}' in paragraph ${paragraphIndex}`);
-      return true;
+      return 'ok';
     }
 
     return await window.Word.run(async (context) => {
-      const paragraphs = context.document.body.paragraphs;
-      paragraphs.load('items');
+      const located = await this.locate(context, paragraphIndex, error, expectedText);
+      if (typeof located === 'string') return located;
+      located.insertText(suggestion, window.Word.InsertLocation.replace);
       await context.sync();
-
-      if (paragraphIndex >= paragraphs.items.length) return false;
-
-      const p = paragraphs.items[paragraphIndex];
-      p.load('text');
-      await context.sync();
-
-      // Tìm kiếm cụm từ trong đoạn
-      const searchResults = p.search(error.goc, { matchCase: true, matchWholeWord: false });
-      searchResults.load(['items', 'text']);
-      await context.sync();
-
-      if (searchResults.items.length === 0) return false;
-
-      const targetRange = this.findMatchingRange(p.text, error.goc, error.batDau, searchResults.items);
-      if (!targetRange) return false;
-
-      // Kiểm tra an toàn: So sánh text của range với từ gốc trước khi ghi
-      targetRange.load('text');
-      await context.sync();
-
-      if (targetRange.text.trim() !== error.goc.trim()) {
-        console.warn('Văn bản trong tài liệu đã thay đổi, hủy thao tác ghi để bảo đảm an toàn.');
-        return false;
-      }
-
-      // Thực hiện thay thế (nếu Track Changes đang bật, Word tự động ghi nhận là thay đổi có theo dõi)
-      targetRange.insertText(suggestion, window.Word.InsertLocation.replace);
-      await context.sync();
-
-      return true;
+      return 'ok' as FixStatus;
     });
   }
 
   /**
-   * Sửa hàng loạt danh sách lỗi theo thứ tự từ cuối văn bản lên đầu (bottom-up)
-   * để không bị lệch offset các vị trí phía trên
+   * Sửa hàng loạt từ cuối văn bản lên đầu. Sửa từ cuối đoạn lên nên vị trí các lỗi phía trước còn đúng;
+   * nội dung mong đợi của đoạn được cập nhật sau mỗi lần ghi.
    */
-  public static async batchReplace(
-    items: WordErrorLocation[]
-  ): Promise<number> {
-    if (!items || items.length === 0) return 0;
+  public static async batchReplace(items: WordErrorLocation[]): Promise<BatchResult> {
+    const result: BatchResult = { succeeded: [], failed: [] };
+    if (!items || items.length === 0) return result;
 
-    // Sắp xếp giảm dần theo chỉ số đoạn văn, và giảm dần theo vị trí batDau trong đoạn
     const sorted = [...items].sort((a, b) => {
-      if (a.paragraphIndex !== b.paragraphIndex) {
-        return b.paragraphIndex - a.paragraphIndex;
-      }
+      if (a.paragraphIndex !== b.paragraphIndex) return b.paragraphIndex - a.paragraphIndex;
       return b.error.batDau - a.error.batDau;
     });
 
-    let successCount = 0;
+    const expected = new Map<number, string>();
     for (const item of sorted) {
-      const ok = await this.replaceError(item.paragraphIndex, item.error, item.selectedSuggestion);
-      if (ok) successCount++;
+      const current = expected.get(item.paragraphIndex) ?? item.paragraphText;
+      const status = await this.replaceError(item.paragraphIndex, item.error, item.selectedSuggestion, current);
+      if (status === 'ok') {
+        result.succeeded.push(item.id);
+        expected.set(
+          item.paragraphIndex,
+          current.slice(0, item.error.batDau) + item.selectedSuggestion + current.slice(item.error.ketThuc)
+        );
+      } else {
+        result.failed.push(item.id);
+      }
     }
 
-    return successCount;
+    return result;
   }
 
-  /**
-   * Tìm đúng Word.Range trong danh sách search results ứng với vị trí offset mong muốn
-   */
-  private static findMatchingRange(
-    paragraphText: string,
-    word: string,
-    targetOffset: number,
-    ranges: Word.Range[]
-  ): Word.Range | null {
-    if (ranges.length === 1) return ranges[0];
+  /** getReviewedText thuộc WordApi 1.4; bản cũ hơn thì dùng text thô */
+  private static loadReviewedText(paragraphs: Word.Paragraph[]): OfficeExtension.ClientResult<string>[] | null {
+    if (!this.checkSupport().is1_4) return null;
+    return paragraphs.map(p => p.getReviewedText('Current'));
+  }
 
-    // Đếm số lần xuất hiện của từ trước targetOffset trong đoạn văn
-    let countBefore = 0;
-    let pos = 0;
+  /** Định vị lỗi trong đoạn. Mọi trường hợp không chắc chắn đều trả về lý do, không trả về range. */
+  private static async locate(
+    context: Word.RequestContext,
+    paragraphIndex: number,
+    error: SpellError,
+    expectedText: string
+  ): Promise<Word.Range | FixStatus> {
+    const paragraphs = context.document.body.paragraphs;
+    paragraphs.load('items');
+    await context.sync();
 
-    while (pos < targetOffset) {
-      const idx = paragraphText.indexOf(word, pos);
-      if (idx === -1 || idx >= targetOffset) break;
-      countBefore++;
-      pos = idx + word.length;
+    const paragraph = paragraphs.items[paragraphIndex];
+    if (!paragraph) return 'stale';
+
+    paragraph.load('text');
+    const reviewed = this.loadReviewedText([paragraph]);
+    await context.sync();
+
+    const raw = paragraph.text;
+    const current = reviewed ? reviewed[0].value : raw;
+    if (current !== expectedText) return 'stale';
+    if (current.slice(error.batDau, error.ketThuc) !== error.goc) return 'stale';
+
+    const results = paragraph.search(this.escapeSearch(error.goc), { matchCase: true, matchWholeWord: false });
+    results.load('items');
+    await context.sync();
+
+    const occurrences = this.occurrenceOffsets(current, error.goc);
+    const position = occurrences.indexOf(error.batDau);
+    if (position === -1) return 'not-found';
+
+    // Chữ đã xóa theo dõi vẫn nằm trong đoạn nên Word có thể tìm ra nhiều hơn số lần hiển thị
+    if (results.items.length !== occurrences.length) {
+      return raw !== current ? 'tracked' : 'not-found';
     }
 
-    if (countBefore < ranges.length) {
-      return ranges[countBefore];
-    }
+    const target = results.items[position];
+    target.load('text');
+    await context.sync();
+    return target.text === error.goc ? target : 'stale';
+  }
 
-    return ranges[0];
+  /** Vị trí các lần xuất hiện, không chồng lấn, khớp cách đếm của tìm kiếm trong Word */
+  private static occurrenceOffsets(text: string, word: string): number[] {
+    const offsets: number[] = [];
+    let index = text.indexOf(word);
+    while (index !== -1) {
+      offsets.push(index);
+      index = text.indexOf(word, index + word.length);
+    }
+    return offsets;
+  }
+
+  /** Dấu ^ là ký tự điều khiển trong ô tìm kiếm của Word */
+  private static escapeSearch(text: string): string {
+    return text.replace(/\^/g, '^^');
   }
 }
