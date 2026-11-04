@@ -18,6 +18,7 @@ Tài liệu phục vụ nghiệm thu các tình huống tương tác thực tế
 | **TC6** | **Tài liệu dài (50 trang, có bảng và ảnh)** | Mở tài liệu thực tế dài 50 trang (~15.000 từ). Bấm "Quét toàn bộ". | Quét hoàn tất trong thời gian dưới 5 giây; giao diện Taskpane không bị đơ giật nhờ Web Worker. | **Chưa kiểm chứng** |
 | **TC7** | **Tài liệu sử dụng font cũ (TCVN3 / VNI)** | Mở văn bản gõ font `.VnTime` hoặc `VNI-Times`. | Hệ thống hiển thị cảnh báo phát hiện font cũ, bỏ qua các đoạn này, không báo lỗi chính tả hàng loạt. | **Chưa kiểm chứng** |
 | **TC7b** | **Đổi font cũ sang Unicode** | Tài liệu có `.VnTime`, `.VnTimeH`, `VNI-Times`, chữ TCVN3 trong font Times New Roman, đậm nghiêng, cỡ 18, tab, xuống dòng mềm, bảng. Bấm Đổi sang Unicode. | Đổi đúng chữ, giữ định dạng, không sinh đoạn trống, quét lại còn 0 đoạn font cũ. | **Đạt** ngày 04/11/2026 trên Word 16.0.20527: 9 đoạn, 44 từ, số đoạn giữ nguyên, 2 lần Ctrl+Z trả về nguyên bản |
+| **TC8** | **Soát trình bày** | Tài liệu có đoạn căn trái, Shift+Enter, dấu cách đầu dòng, căn bằng dấu cách, khác cỡ, khác font, tên font sai, cùng bảng và tiêu đề căn giữa. | Báo đúng các chỗ cố ý, không báo bảng và tiêu đề; sửa xong sạch danh sách, chỉ còn mục chỉ báo. | **Đạt** ngày 04/11/2026 trên Word 16.0.20527: 7/7 mục, sửa 6 mục, còn 1 mục chỉ báo |
 
 ---
 

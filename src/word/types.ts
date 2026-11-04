@@ -9,6 +9,12 @@ export interface ParagraphInfo {
   isOldFont: boolean;
   fontName?: string;
   locationType: 'body' | 'table';
+  /** Thuộc tính trình bày, chỉ có khi đọc từ Word thật */
+  fontSize?: number;
+  alignment?: string;
+  outlineLevel?: number;
+  tableNestingLevel?: number;
+  style?: string;
 }
 
 export interface WordScanResult {

@@ -5,11 +5,12 @@ import { ScanControls } from './components/ScanControls';
 import { ErrorList } from './components/ErrorList';
 import { BatchFixModal } from './components/BatchFixModal';
 import { OldFontModal } from './components/OldFontModal';
+import { LayoutFixModal } from './components/LayoutFixModal';
 import { UserDictionaryModal } from './components/UserDictionaryModal';
 import { AboutModal } from './components/AboutModal';
 import { Footer } from './components/Footer';
 import { useUserDictionary } from './hooks/useUserDictionary';
-import { useChecker, isBatchEligible } from './hooks/useChecker';
+import { useChecker, isBatchEligible, isLayoutBatchEligible } from './hooks/useChecker';
 
 export const App: React.FC = () => {
   const {
@@ -22,6 +23,7 @@ export const App: React.FC = () => {
 
   const {
     items,
+    layoutIssues,
     isScanning,
     hasScanned,
     oldFontWarning,
@@ -35,6 +37,10 @@ export const App: React.FC = () => {
     dropWord,
     batchFixSure,
     convertOldFonts,
+    selectLayout,
+    fixLayout,
+    ignoreLayout,
+    batchFixLayout,
     updateSuggestion
   } = useChecker(dictWords);
 
@@ -44,8 +50,11 @@ export const App: React.FC = () => {
   const [isFixingBatch, setIsFixingBatch] = useState(false);
   const [isConvertOpen, setIsConvertOpen] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
+  const [isLayoutBatchOpen, setIsLayoutBatchOpen] = useState(false);
+  const [isFixingLayout, setIsFixingLayout] = useState(false);
 
   const sureItems = items.filter(isBatchEligible);
+  const layoutBatchCount = layoutIssues.filter(isLayoutBatchEligible).length;
 
   const handleConfirmBatch = async () => {
     setIsFixingBatch(true);
@@ -54,6 +63,16 @@ export const App: React.FC = () => {
       setIsBatchOpen(false);
     } finally {
       setIsFixingBatch(false);
+    }
+  };
+
+  const handleConfirmLayoutBatch = async () => {
+    setIsFixingLayout(true);
+    try {
+      await batchFixLayout();
+      setIsLayoutBatchOpen(false);
+    } finally {
+      setIsFixingLayout(false);
     }
   };
 
@@ -93,6 +112,12 @@ export const App: React.FC = () => {
         <main className="main-content">
           <ErrorList
             items={items}
+            layoutIssues={layoutIssues}
+            layoutBatchCount={layoutBatchCount}
+            onOpenLayoutBatch={() => setIsLayoutBatchOpen(true)}
+            onSelectLayout={selectLayout}
+            onFixLayout={fixLayout}
+            onIgnoreLayout={ignoreLayout}
             hasScanned={hasScanned}
             onSelect={selectInWord}
             onFix={(item, sug) => fixError(item, sug)}
@@ -110,6 +135,14 @@ export const App: React.FC = () => {
           count={sureItems.length}
           onConfirm={handleConfirmBatch}
           isFixing={isFixingBatch}
+        />
+
+        <LayoutFixModal
+          open={isLayoutBatchOpen}
+          onOpenChange={setIsLayoutBatchOpen}
+          count={layoutBatchCount}
+          onConfirm={handleConfirmLayoutBatch}
+          isFixing={isFixingLayout}
         />
 
         <OldFontModal

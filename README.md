@@ -19,7 +19,9 @@ Office Web Add-in chuyên dụng phục vụ công tác rà soát lỗi chính t
    - Không làm hỏng cấu trúc bảng biểu, hình ảnh hay định dạng chữ.
    - Tương thích hoàn toàn với tính năng **Track Changes** (sửa đổi được theo dõi) và **Undo (Ctrl+Z)**.
    - Nhận diện tài liệu dùng font cũ (`.VnTime`, `VNI-Times`), không báo lỗi ảo, và có nút đổi sang Unicode giữ nguyên đậm, nghiêng, cỡ chữ.
-4. **Trải Nghiệm Hiện Đại:**
+4. **Soát Trình Bày:**
+   - Thẻ Trình bày báo đoạn chưa căn đều, dòng giãn do Shift+Enter, căn lề bằng dấu cách, font và cỡ chữ không đồng nhất, có nút sửa từng mục hoặc hàng loạt.
+5. **Trải Nghiệm Hiện Đại:**
    - Giao diện Fluent UI v9 hiện đại, mượt mà trong Taskpane bên phải Word.
    - Quét nền bằng Web Worker, không gây đơ giật Word trên tài liệu dài 50 trang.
    - Hỗ trợ sửa nhanh hàng loạt (bottom-up) cho các lỗi mức **Chắc chắn**.

@@ -5,11 +5,14 @@ import {
   tokens,
   TabList,
   Tab,
-  Text
+  Text,
+  Button
 } from '@fluentui/react-components';
 import { CheckmarkCircleFilled } from '@fluentui/react-icons';
 import { DisplayErrorItem } from '../hooks/useChecker';
 import { ErrorCard } from './ErrorCard';
+import { LayoutCard } from './LayoutCard';
+import { LayoutIssue } from '../../word/layoutCheck';
 
 const useStyles = makeStyles({
   stickyTabs: {
@@ -40,6 +43,12 @@ const useStyles = makeStyles({
 
 interface ErrorListProps {
   items: DisplayErrorItem[];
+  layoutIssues: LayoutIssue[];
+  layoutBatchCount: number;
+  onOpenLayoutBatch: () => void;
+  onSelectLayout: (issue: LayoutIssue) => void;
+  onFixLayout: (issue: LayoutIssue) => void;
+  onIgnoreLayout: (issue: LayoutIssue) => void;
   hasScanned: boolean;
   onSelect: (item: DisplayErrorItem) => void;
   onFix: (item: DisplayErrorItem, suggestion: string) => void;
@@ -50,6 +59,12 @@ interface ErrorListProps {
 
 export const ErrorList: React.FC<ErrorListProps> = ({
   items,
+  layoutIssues,
+  layoutBatchCount,
+  onOpenLayoutBatch,
+  onSelectLayout,
+  onFixLayout,
+  onIgnoreLayout,
   hasScanned,
   onSelect,
   onFix,
@@ -58,10 +73,11 @@ export const ErrorList: React.FC<ErrorListProps> = ({
   onUpdateSuggestion
 }) => {
   const styles = useStyles();
-  const [activeTab, setActiveTab] = useState<'all' | 'chac-chan' | 'nen-xem' | 'goi-y'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'chac-chan' | 'nen-xem' | 'goi-y' | 'trinh-bay'>('all');
 
   const filteredItems = items.filter(item => {
     if (activeTab === 'all') return true;
+    if (activeTab === 'trinh-bay') return false;
     return item.error.mucDo === activeTab;
   });
 
@@ -69,12 +85,14 @@ export const ErrorList: React.FC<ErrorListProps> = ({
   const countReview = items.filter(i => i.error.mucDo === 'nen-xem').length;
   const countSuggestion = items.filter(i => i.error.mucDo === 'goi-y').length;
 
-  if (hasScanned && items.length === 0) {
+  const shownLayout = activeTab === 'all' || activeTab === 'trinh-bay' ? layoutIssues : [];
+
+  if (hasScanned && items.length === 0 && layoutIssues.length === 0) {
     return (
       <div className={styles.emptyState}>
         <CheckmarkCircleFilled className={styles.successIcon} />
         <Text weight="semibold" size={400}>Văn bản rất chuẩn xác!</Text>
-        <Text size={200}>Không phát hiện lỗi chính tả hoặc quy chuẩn nào.</Text>
+        <Text size={200}>Không phát hiện lỗi chính tả, quy chuẩn hay trình bày nào.</Text>
       </div>
     );
   }
@@ -96,10 +114,11 @@ export const ErrorList: React.FC<ErrorListProps> = ({
           onTabSelect={(_, data) => setActiveTab(data.value as typeof activeTab)}
           size="small"
         >
-          <Tab value="all">Tất cả ({items.length})</Tab>
+          <Tab value="all">Tất cả ({items.length + layoutIssues.length})</Tab>
           <Tab value="chac-chan">Chắc chắn ({countSure})</Tab>
           <Tab value="nen-xem">Nên xem ({countReview})</Tab>
           {countSuggestion > 0 && <Tab value="goi-y">Gợi ý ({countSuggestion})</Tab>}
+          <Tab value="trinh-bay">Trình bày ({layoutIssues.length})</Tab>
         </TabList>
       </div>
 
@@ -113,6 +132,22 @@ export const ErrorList: React.FC<ErrorListProps> = ({
             onIgnore={() => onIgnore(item.id)}
             onAddToDict={(w) => onAddToDict(w)}
             onUpdateSuggestion={(sug) => onUpdateSuggestion(item.id, sug)}
+          />
+        ))}
+
+        {activeTab === 'trinh-bay' && layoutBatchCount > 0 && (
+          <Button size="small" style={{ marginBottom: '6px' }} onClick={onOpenLayoutBatch}>
+            Sửa hàng loạt {layoutBatchCount} mục
+          </Button>
+        )}
+
+        {shownLayout.map(issue => (
+          <LayoutCard
+            key={issue.id}
+            issue={issue}
+            onSelect={() => onSelectLayout(issue)}
+            onFix={() => onFixLayout(issue)}
+            onIgnore={() => onIgnoreLayout(issue)}
           />
         ))}
       </div>

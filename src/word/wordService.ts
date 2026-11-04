@@ -1,6 +1,7 @@
 import { BatchResult, FixStatus, OldFontConvertResult, ParagraphInfo, WordScanResult, WordErrorLocation } from './types';
 import { detectOldFont } from './fontDetector';
 import { convertLegacyText, detectLegacyEncoding, isLegacyFontName, unicodeFontFor } from './legacyEncoding';
+import { LayoutIssue, softBreakReplacements } from './layoutCheck';
 import { SpellError } from '../engine/types';
 
 // Mọi quan hệ có phần chung với vùng chọn. Bỏ sót quan hệ nào là đoạn đó bị quét thiếu mà không báo.
@@ -96,7 +97,12 @@ export class WordService {
 
     return await window.Word.run(async (context) => {
       const bodyParagraphs = context.document.body.paragraphs;
-      bodyParagraphs.load(['text', 'font/name']);
+      // Gọi load một lần: gọi lần hai trên cùng danh sách sẽ đè lần trước.
+      // tableNestingLevel cần WordApi 1.3; thiếu thì không soát trình bày, các phần khác vẫn chạy.
+      bodyParagraphs.load([
+        'text', 'font/name', 'font/size', 'alignment', 'outlineLevel', 'style',
+        ...(this.checkSupport().is1_3 ? ['tableNestingLevel'] : [])
+      ]);
 
       let selection: Word.Range | null = null;
       if (scope === 'selection') {
@@ -143,7 +149,12 @@ export class WordService {
           hasTrackedChanges: text !== this.withoutParagraphMark(raw),
           isOldFont: fontCheck.isOldFont,
           fontName,
-          locationType: 'body'
+          locationType: 'body',
+          fontSize: paragraph.font?.size ?? undefined,
+          alignment: paragraph.alignment,
+          outlineLevel: paragraph.outlineLevel,
+          tableNestingLevel: paragraph.tableNestingLevel,
+          style: paragraph.style
         });
       });
 
@@ -237,6 +248,84 @@ export class WordService {
 
       return result;
     });
+  }
+
+  /** Chọn cả đoạn trong Word để người dùng nhìn thấy */
+  public static async selectParagraph(paragraphIndex: number, expectedText: string): Promise<FixStatus> {
+    if (!this.isWordAvailable()) return 'ok';
+    return await window.Word.run(async (context) => {
+      const paragraph = await this.loadExpected(context, paragraphIndex, expectedText);
+      if (typeof paragraph === 'string') return paragraph;
+      paragraph.select();
+      await context.sync();
+      return 'ok' as FixStatus;
+    });
+  }
+
+  /** Sửa một mục trình bày. Đoạn đã đổi so với lúc quét thì không ghi. */
+  public static async fixLayout(issue: LayoutIssue): Promise<FixStatus> {
+    if (!this.isWordAvailable()) return 'ok';
+
+    return await window.Word.run(async (context) => {
+      const paragraph = await this.loadExpected(context, issue.paragraphIndex, issue.paragraphText);
+      if (typeof paragraph === 'string') return paragraph;
+
+      if (issue.kind === 'align') {
+        paragraph.alignment = 'Justified';
+      } else if (issue.kind === 'font' && issue.font) {
+        paragraph.font.name = issue.font.name;
+        paragraph.font.size = issue.font.size;
+      } else if (issue.kind === 'lead-space' || issue.kind === 'soft-break') {
+        // Hai loại này đổi chữ nên không làm trên đoạn đang có sửa đổi theo dõi
+        if (this.withoutParagraphMark(paragraph.text) !== issue.paragraphText) return 'tracked';
+
+        if (issue.kind === 'lead-space') {
+          const lead = /^ +/.exec(issue.paragraphText);
+          if (!lead) return 'not-found';
+          const found = paragraph.search(lead[0], { matchCase: true });
+          found.load('items');
+          await context.sync();
+          if (found.items.length === 0) return 'not-found';
+          found.items[0].delete();
+        } else {
+          const replacements = softBreakReplacements(issue.paragraphText);
+          const found = paragraph.search('^l');
+          found.load('items');
+          await context.sync();
+          if (found.items.length !== replacements.length) return 'not-found';
+          // Làm từ cuối lên để không lệch các vị trí phía trước
+          for (let i = replacements.length - 1; i >= 0; i--) {
+            found.items[i].insertText(replacements[i], window.Word.InsertLocation.replace);
+          }
+        }
+      } else {
+        return 'not-found';
+      }
+
+      await context.sync();
+      return 'ok' as FixStatus;
+    });
+  }
+
+  /** Lấy đoạn và kiểm tra nội dung còn khớp lúc quét */
+  private static async loadExpected(
+    context: Word.RequestContext,
+    paragraphIndex: number,
+    expectedText: string
+  ): Promise<Word.Paragraph | FixStatus> {
+    const paragraphs = context.document.body.paragraphs;
+    paragraphs.load('items');
+    await context.sync();
+
+    const paragraph = paragraphs.items[paragraphIndex];
+    if (!paragraph) return 'stale';
+
+    paragraph.load('text');
+    const reviewed = this.loadReviewedText([paragraph]);
+    await context.sync();
+
+    const current = reviewed ? this.withoutParagraphMark(reviewed[0].value) : paragraph.text;
+    return current === expectedText ? paragraph : 'stale';
   }
 
   /** Đọc lại một đoạn sau khi sửa để lấy nội dung và vị trí mới */

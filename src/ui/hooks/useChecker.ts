@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { WordService } from '../../word/wordService';
 import { isLegacyFontName } from '../../word/legacyEncoding';
+import { checkLayout, LayoutIssue } from '../../word/layoutCheck';
 import { checkParagraphsWithWorker } from '../../engine/workerClient';
 import { prepareEngine } from '../loadModel';
 import { SpellError, CheckOptions } from '../../engine/types';
@@ -18,6 +19,13 @@ export interface Notice {
   intent: 'success' | 'warning' | 'error';
   text: string;
 }
+
+/** Dấu cách đầu dòng có thể đang căn biểu mẫu nên phải sửa từng mục */
+export function isLayoutBatchEligible(issue: LayoutIssue): boolean {
+  return issue.fixable && issue.kind !== 'lead-space';
+}
+
+const layoutKey = (issue: LayoutIssue) => `${issue.kind}|${issue.paragraphText}`;
 
 /** Chỉ tự động sửa lỗi chắc chắn và có đúng một cách sửa; còn lại phải có người chọn */
 export function isBatchEligible(item: DisplayErrorItem): boolean {
@@ -45,6 +53,9 @@ function toItems(paragraph: ParagraphInfo, errors: SpellError[]): DisplayErrorIt
 export function useChecker(userDictionary: string[]) {
   const [items, setItems] = useState<DisplayErrorItem[]>([]);
   const [ignored, setIgnored] = useState<Set<string>>(new Set());
+  const [layoutIssues, setLayoutIssues] = useState<LayoutIssue[]>([]);
+  const ignoredLayout = useRef<Set<string>>(new Set());
+  const lastScope = useRef<'all' | 'selection'>('all');
   const [isScanning, setIsScanning] = useState(false);
   const [hasScanned, setHasScanned] = useState(false);
   const [oldFontWarning, setOldFontWarning] = useState<string | null>(null);
@@ -64,7 +75,9 @@ export function useChecker(userDictionary: string[]) {
 
   const checkOptions: CheckOptions = { ...options, userDictionary };
 
-  const scan = useCallback(async (scope: 'all' | 'selection' = 'all') => {
+  const scan = useCallback(async (scope: 'all' | 'selection' = 'all', keepIgnored = false) => {
+    lastScope.current = scope;
+    if (!keepIgnored) ignoredLayout.current = new Set();
     setIsScanning(true);
     setOldFontWarning(null);
     setNotice(null);
@@ -86,8 +99,14 @@ export function useChecker(userDictionary: string[]) {
 
       // Chạy kiểm tra bất đồng bộ trong Web Worker để không đơ giao diện
       const batchErrors = await checkParagraphsWithWorker(validParagraphs.map(p => p.text), checkOptions);
-      setItems(validParagraphs.flatMap((p, i) => toItems(p, batchErrors[i] || [])));
-      setIgnored(new Set());
+      const found = validParagraphs.flatMap((p, i) => toItems(p, batchErrors[i] || []));
+      setItems(keepIgnored ? found.filter(item => !ignored.has(ignoreKey(item))) : found);
+      if (!keepIgnored) setIgnored(new Set());
+      // Vùng chọn quá ít đoạn để kết luận font chủ đạo của văn bản
+      setLayoutIssues(
+        checkLayout(scanResult.paragraphs, { checkFont: scope === 'all' })
+          .filter(issue => !ignoredLayout.current.has(layoutKey(issue)))
+      );
       setHasScanned(true);
     } catch (e) {
       console.error('Lỗi khi quét tài liệu Word:', e);
@@ -95,7 +114,7 @@ export function useChecker(userDictionary: string[]) {
     } finally {
       setIsScanning(false);
     }
-  }, [options, userDictionary]);
+  }, [options, userDictionary, ignored]);
 
   /** Quét lại các đoạn vừa đổi để danh sách lỗi và vị trí luôn khớp tài liệu */
   const rescanParagraphs = async (indexes: number[]) => {
@@ -208,6 +227,59 @@ export function useChecker(userDictionary: string[]) {
     }
   };
 
+  const selectLayout = async (issue: LayoutIssue): Promise<void> => {
+    setNotice(null);
+    try {
+      const status = await WordService.selectParagraph(issue.paragraphIndex, issue.paragraphText);
+      if (status !== 'ok') await reportLayoutFailure(status);
+    } catch (e) {
+      setNotice({ intent: 'error', text: `Không chọn được đoạn: ${(e as Error).message ?? e}` });
+    }
+  };
+
+  /** Đoạn đã đổi thì danh sách cũ không còn đúng, quét lại rồi mới báo */
+  const reportLayoutFailure = async (status: Exclude<FixStatus, 'ok'>): Promise<void> => {
+    await scan(lastScope.current, true);
+    setNotice({ intent: 'warning', text: FIX_FAILURE_TEXT[status] });
+  };
+
+  /** Sửa trình bày có thể đổi số đoạn và vị trí chữ nên luôn quét lại */
+  const fixLayout = async (issue: LayoutIssue): Promise<void> => {
+    setNotice(null);
+    try {
+      const status = await WordService.fixLayout(issue);
+      if (status === 'ok') await scan(lastScope.current, true);
+      else await reportLayoutFailure(status);
+    } catch (e) {
+      setNotice({ intent: 'error', text: `Không sửa được: ${(e as Error).message ?? e}` });
+    }
+  };
+
+  const ignoreLayout = (issue: LayoutIssue): void => {
+    ignoredLayout.current.add(layoutKey(issue));
+    setLayoutIssues(prev => prev.filter(i => i.id !== issue.id));
+  };
+
+  const batchFixLayout = async (): Promise<void> => {
+    setNotice(null);
+    // Từ cuối lên vì sửa dòng giãn có thể thêm đoạn. Trong một đoạn, mục không đổi chữ làm trước.
+    const eligible = layoutIssues.filter(isLayoutBatchEligible).sort((a, b) =>
+      b.paragraphIndex - a.paragraphIndex || Number(a.kind === 'soft-break') - Number(b.kind === 'soft-break'));
+    let done = 0;
+    try {
+      for (const issue of eligible) {
+        if ((await WordService.fixLayout(issue)) === 'ok') done++;
+      }
+      await scan(lastScope.current, true);
+      const failed = eligible.length - done;
+      setNotice(failed === 0
+        ? { intent: 'success', text: `Đã sửa ${done} mục trình bày.` }
+        : { intent: 'warning', text: `Đã sửa ${done} mục, ${failed} mục chưa sửa được và vẫn còn trong danh sách.` });
+    } catch (e) {
+      setNotice({ intent: 'error', text: `Sửa hàng loạt bị gián đoạn: ${(e as Error).message ?? e}. Hãy quét lại.` });
+    }
+  };
+
   const updateSuggestion = (itemId: string, suggestion: string) => {
     setItems(prev =>
       prev.map(i => (i.id === itemId ? { ...i, selectedSuggestion: suggestion } : i))
@@ -216,6 +288,7 @@ export function useChecker(userDictionary: string[]) {
 
   return {
     items,
+    layoutIssues,
     isScanning,
     hasScanned,
     oldFontWarning,
@@ -229,6 +302,10 @@ export function useChecker(userDictionary: string[]) {
     dropWord,
     batchFixSure,
     convertOldFonts,
+    selectLayout,
+    fixLayout,
+    ignoreLayout,
+    batchFixLayout,
     updateSuggestion
   };
 }
