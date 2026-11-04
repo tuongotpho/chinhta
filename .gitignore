@@ -51,3 +51,4 @@ scripts/scan-*.js
 
 # Dữ liệu tải về để đánh giá (VSEC, từ điển ngoài)
 data/ngoai/
+ban-phat-hanh/

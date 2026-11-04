@@ -17,8 +17,9 @@ Phục vụ cán bộ nhân viên trong đơn vị tự động rà soát lỗi 
 
 ### 3. Yêu Cầu Kết Nối Mạng
 Add-in chỉ cần tải các tệp giao diện web tĩnh (HTML, CSS, JS) khi khởi động từ địa chỉ:
-1. `https://soatchinhta-addin.web.app` (Firebase Hosting tĩnh của add-in).
+1. `https://soatchinhta.web.app` (Firebase Hosting tĩnh của add-in).
 2. `https://appsforoffice.microsoft.com` (Thư viện Office.js chính thức được ký số bởi Microsoft).
+3. Một thư mục mạng dùng chung nội bộ (quyền đọc) chứa tệp `manifest.xml`.
 Máy trạm không cần mở thêm bất kỳ port hay kết nối socket/database nào.
 
 ### 4. Giải Trình Về Quyền Hạn (Permission)
@@ -26,24 +27,17 @@ Manifest yêu cầu quyền: `<Permissions>ReadWriteDocument</Permissions>`.
 - **Mục đích:** Add-in cần đọc nội dung các đoạn văn trong tài liệu Word đang mở để phát hiện lỗi, và thay thế cụm từ sai bằng cụm từ đúng khi người dùng bấm nút "Sửa" hoặc "Sửa hàng loạt".
 - Add-in **không** can thiệp vào hệ thống tệp bên ngoài Word, không truy cập macro, không chỉnh sửa Registry hệ thống.
 
-### 5. Chi Tiết Thay Đổi Trên Máy Trạm Của Người Dùng (Đường Cài Đặt T)
-Add-in không yêu cầu quyền Quản trị viên (Admin) và không chạy bất kỳ tệp thực thi (`.exe`, `.msi`, `.bat`, `.ps1`) nào. Quá trình đăng ký chỉ thực hiện đúng 2 thay đổi cục bộ trong không gian người dùng hiện tại:
-1. **Lưu trữ tệp manifest cấu hình:** Lưu tại đường dẫn `%USERPROFILE%\SoatChinhTa\manifest.xml`.
-2. **Khai báo sideloading với Word:** Thêm 1 khóa chuỗi (String Value) vào nhánh Registry người dùng hiện tại:
-   - **Khóa:** `HKCU\Software\Microsoft\Office\16.0\Wef\Developer`
-   - **Tên:** `0d864eeb-0939-4159-8800-21a3426119d2`
-   - **Giá trị:** `%USERPROFILE%\SoatChinhTa\manifest.xml`
-   *(Đây là cơ chế sideloading chính thức được Microsoft tài liệu hóa cho Office 16.0/M365).*
+### 5. Chi Tiết Thay Đổi Trên Máy Trạm Của Người Dùng
+Add-in không yêu cầu quyền Quản trị viên (Admin) và không cài tệp `.exe` hay `.msi`. Việc đăng ký do tệp lệnh văn bản `CAI-SOAT-CHINH-TA.cmd` thực hiện (mở bằng Notepad để đọc toàn bộ nội dung được), chạy từ thư mục mạng, và chỉ thêm 1 khóa trong nhánh người dùng hiện tại:
+- **Khóa:** `HKCU\Software\Microsoft\Office\16.0\WEF\TrustedCatalogs\{7C1F4E2A-3B6D-4F58-9A17-5D2E8C0B6F31}`
+- **Giá trị:** `Id`, `Url` (đường dẫn thư mục mạng), `Flags` = 1 (hiện trong menu của Word)
+
+Đây là thiết lập Trusted Add-in Catalogs do Microsoft mô tả. Sau đó người dùng tự thêm add-in một lần trong Word.
 
 ### 6. Cách Thức Gỡ Bỏ Hoàn Toàn (Uninstall)
-Khi cần thu hồi hoặc ngừng dùng thử, chỉ cần dán lệnh sau vào Command Prompt:
-```cmd
-reg delete "HKCU\Software\Microsoft\Office\16.0\Wef\Developer" /v "0d864eeb-0939-4159-8800-21a3426119d2" /f
-rmdir /s /q "%USERPROFILE%\SoatChinhTa"
-```
-Hệ thống máy trạm sẽ trở lại nguyên trạng 100%, không để lại bất kỳ tiến trình chạy ngầm hay tệp rác nào.
+Bấm đúp tệp `GO-SOAT-CHINH-TA.cmd`. Tệp này xóa khóa trên, nội dung tệp đọc được bằng Notepad.
 
 ### 7. Lưu Ý Giới Hạn Kỹ Thuật
-Đường cài T là cơ chế đăng ký trực tiếp trên từng máy trạm dành cho môi trường phát triển/thử nghiệm nội bộ (Microsoft không cam kết bảo hành như qua Microsoft 365 Admin Center). Do đơn vị chưa có hệ thống quản lý tenant M365 tập trung, giải pháp này là tối ưu nhất về mặt an ninh và tính khả thi triển khai.
+Microsoft xếp đường thư mục mạng vào loại dùng để thử, không phải triển khai chính thức. Vì vậy đề nghị này chỉ cho nhóm 5 - 10 máy. Triển khai rộng sẽ có đề xuất riêng, xem [báo cáo 05](../05-BAO-CAO-CACH-CAI-DAT-CHO-NHAN-VIEN-VAN-PHONG.md).
 
 *Kính mong Phòng CNTT xem xét và chấp thuận cho phép thử nghiệm trên nhóm 5 - 10 máy trạm.*

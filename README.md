@@ -18,7 +18,7 @@ Office Web Add-in chuyên dụng phục vụ công tác rà soát lỗi chính t
 3. **An Toàn Văn Bản & Định Dạng:**
    - Không làm hỏng cấu trúc bảng biểu, hình ảnh hay định dạng chữ.
    - Tương thích hoàn toàn với tính năng **Track Changes** (sửa đổi được theo dõi) và **Undo (Ctrl+Z)**.
-   - Nhận diện và cảnh báo tài liệu sử dụng font cũ (`.VnTime`, `VNI-Times`), tự động bỏ qua để không báo lỗi ảo.
+   - Nhận diện tài liệu dùng font cũ (`.VnTime`, `VNI-Times`), không báo lỗi ảo, và có nút đổi sang Unicode giữ nguyên đậm, nghiêng, cỡ chữ.
 4. **Trải Nghiệm Hiện Đại:**
    - Giao diện Fluent UI v9 hiện đại, mượt mà trong Taskpane bên phải Word.
    - Quét nền bằng Web Worker, không gây đơ giật Word trên tài liệu dài 50 trang.
@@ -29,19 +29,14 @@ Office Web Add-in chuyên dụng phục vụ công tác rà soát lỗi chính t
 
 ## 🚀 Cài Đặt Nhanh (Đường T - Không Cần Quyền Admin)
 
-Mở **Command Prompt** (cmd) và dán lệnh sau:
+1. Chạy `npm run dong-goi` để tạo `ban-phat-hanh/SoatChinhTa-CaiDat.zip`.
+2. Giải nén lên một thư mục mạng dùng chung, mọi người có quyền đọc.
+3. Nhân viên làm theo [hướng dẫn người dùng](docs/HUONG-DAN-NGUOI-DUNG.md).
 
-```cmd
-mkdir "%USERPROFILE%\SoatChinhTa" & curl -s -o "%USERPROFILE%\SoatChinhTa\manifest.xml" https://raw.githubusercontent.com/tuongotpho/chinhta/main/manifest.xml & reg add "HKCU\Software\Microsoft\Office\16.0\Wef\Developer" /v "0d864eeb-0939-4159-8800-21a3426119d2" /t REG_SZ /d "%USERPROFILE%\SoatChinhTa\manifest.xml" /f
-```
-
-Khởi động lại Microsoft Word: Tab **Chính Tả** sẽ xuất hiện trên thanh Ribbon.
+Không dùng đường `Wef\Developer`: từ bản cập nhật Word 24–25/09/2026 add-in nạp kiểu này mất sau mỗi lần đóng Word. Số đo ở [KET-QUA-THU-CAI-DAT.md](docs/KET-QUA-THU-CAI-DAT.md).
 
 ### Gỡ cài đặt:
-```cmd
-reg delete "HKCU\Software\Microsoft\Office\16.0\Wef\Developer" /v "0d864eeb-0939-4159-8800-21a3426119d2" /f
-rmdir /s /q "%USERPROFILE%\SoatChinhTa"
-```
+Bấm đúp `GO-SOAT-CHINH-TA.cmd` trong bộ cài.
 
 ---
 

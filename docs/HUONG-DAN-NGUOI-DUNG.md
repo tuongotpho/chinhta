@@ -9,14 +9,13 @@ Tác giả: **August87** - Điện thoại / Zalo hỗ trợ: **0982722036**
 
 Không cần cài phần mềm, không cần quyền quản trị viên máy tính:
 
-1. Nhấn phím **Windows**, gõ `cmd` rồi bấm **Enter** để mở cửa sổ Command Prompt màu đen.
-2. Sao chép toàn bộ dòng lệnh dưới đây:
-   ```cmd
-   mkdir "%USERPROFILE%\SoatChinhTa" & curl -s -o "%USERPROFILE%\SoatChinhTa\manifest.xml" https://raw.githubusercontent.com/tuongotpho/chinhta/main/manifest.xml & reg add "HKCU\Software\Microsoft\Office\16.0\Wef\Developer" /v "0d864eeb-0939-4159-8800-21a3426119d2" /t REG_SZ /d "%USERPROFILE%\SoatChinhTa\manifest.xml" /f
-   ```
-3. Nhấp chuột phải vào cửa sổ Command Prompt để dán và nhấn **Enter**.
-4. Mở Word lên: Trên thanh Ribbon xuất hiện tab **Chính Tả** với nút **Soát Chính Tả**.
-
+1. Lưu tài liệu, đóng hết Word.
+2. Mở thư mục bộ cài trên **ổ mạng dùng chung**, bấm đúp tệp `CAI-SOAT-CHINH-TA.cmd`. Nếu Windows cảnh báo, bấm **More info** rồi **Run anyway**.
+3. Mở Word, tab **Home**, bấm nút **Add-ins**, chọn dòng cuối bảng (**More Add-ins** hoặc **Get Add-ins**).
+4. Chọn mục **SHARED FOLDER**, bấm vào **Soát Chính Tả**, bấm **Add**. Nút Add mờ là do chưa bấm chọn add-in.
+
+Từ đó tab **Chính Tả** luôn có trong Word.
+
 ---
 
 ## 2. Hướng Dẫn Sử Dụng Hằng Ngày
@@ -44,6 +43,12 @@ Add-in phân loại lỗi thành 3 nhóm rõ ràng:
 
 > Add-in không dùng AI. Luật ngữ cảnh R8 dựa trên tần suất cặp âm tiết nên chỉ ở mức **Nên xem**: bạn phải đọc và tự quyết định. Add-in không thay được người đọc lại.
 
+### Văn bản dùng font cũ (.VnTime, TCVN3, VNI)
+- Khi quét, add-in báo các đoạn dùng font cũ và chưa soát lỗi các đoạn đó.
+- Bấm **Đổi sang Unicode**, đọc hộp xác nhận rồi bấm **Đồng ý đổi**. Add-in đổi chữ và font, giữ đậm, nghiêng, cỡ chữ, kể cả chữ trong bảng, rồi tự quét lại.
+- Nên lưu một bản sao trước khi đổi và đọc lại văn bản sau khi đổi. Muốn hoàn tác thì bấm Ctrl+Z, văn bản dài có thể phải bấm nhiều lần.
+- Đầu trang, chân trang và hộp văn bản chưa được đổi.
+
 ### Bước 4: Sửa Nhanh Hàng Loạt Lỗi Chắc Chắn
 - Nếu tài liệu có nhiều lỗi hiển nhiên, bấm nút **Sửa nhanh ... lỗi chắc chắn**. Nút này chỉ sửa lỗi có đúng một cách sửa; lỗi còn lại cần bạn chọn.
 - Một hộp thoại xác nhận sẽ hiện ra, bấm **Đồng ý sửa**. Add-in sẽ tự động sửa lần lượt từ cuối văn bản lên đầu một cách an toàn và chuẩn xác.
@@ -58,7 +63,4 @@ Add-in phân loại lỗi thành 3 nhóm rõ ràng:
 ---
 
 ## 4. Cách Gỡ Cài Đặt Khi Không Dùng Nữa
-Mở cửa sổ `cmd` và dán lệnh sau:
-```cmd
-reg delete "HKCU\Software\Microsoft\Office\16.0\Wef\Developer" /v "0d864eeb-0939-4159-8800-21a3426119d2" /f
-```
+Bấm đúp tệp `GO-SOAT-CHINH-TA.cmd` trong bộ cài.

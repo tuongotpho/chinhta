@@ -1,5 +1,6 @@
-import { BatchResult, FixStatus, ParagraphInfo, WordScanResult, WordErrorLocation } from './types';
+import { BatchResult, FixStatus, OldFontConvertResult, ParagraphInfo, WordScanResult, WordErrorLocation } from './types';
 import { detectOldFont } from './fontDetector';
+import { convertLegacyText, detectLegacyEncoding, isLegacyFontName, unicodeFontFor } from './legacyEncoding';
 import { SpellError } from '../engine/types';
 
 // Mọi quan hệ có phần chung với vùng chọn. Bỏ sót quan hệ nào là đoạn đó bị quét thiếu mà không báo.
@@ -13,6 +14,12 @@ const SELECTED_RELATIONS = new Set<string>([
  * Lớp WordService đóng gói toàn bộ tương tác với Microsoft Word qua Office.js (Word.run).
  * Toàn bộ logic Word chỉ nằm trong module này, độc lập hoàn toàn với src/engine/.
  */
+/** Số đoạn đổi trong một lần gửi sang Word, tránh một lệnh quá lớn với tài liệu dài */
+const CONVERT_BATCH_SIZE = 40;
+
+/** Dấu cuối Word kèm theo chữ: \r cuối đoạn, tab hoặc \u0007 cuối ô bảng */
+const PARAGRAPH_MARK = /[\r\n\t\u0007]+$/;
+
 export class WordService {
   /**
    * Kiểm tra môi trường có đang chạy bên trong Microsoft Word hay không
@@ -82,6 +89,11 @@ export class WordService {
       };
     }
 
+    // Quét vùng chọn cần compareLocationWith (WordApi 1.3). Quét toàn bộ không cần nên Word cũ vẫn dùng được.
+    if (scope === 'selection' && !this.checkSupport().is1_3) {
+      throw new Error('Phiên bản Word này chưa hỗ trợ quét vùng chọn. Hãy bấm Quét toàn bộ.');
+    }
+
     return await window.Word.run(async (context) => {
       const bodyParagraphs = context.document.body.paragraphs;
       bodyParagraphs.load(['text', 'font/name']);
@@ -119,7 +131,7 @@ export class WordService {
       wanted.forEach((index, position) => {
         const paragraph = bodyParagraphs.items[index];
         const raw = paragraph.text;
-        const text = reviewed ? reviewed[position].value : raw;
+        const text = reviewed ? this.withoutParagraphMark(reviewed[position].value) : raw;
         const fontName = paragraph.font?.name;
         const fontCheck = detectOldFont(fontName, text);
         if (fontCheck.isOldFont) oldFontCount++;
@@ -128,7 +140,7 @@ export class WordService {
         resultParagraphs.push({
           index, // Luôn là chỉ số thực tế trong body
           text,
-          hasTrackedChanges: text !== raw,
+          hasTrackedChanges: text !== this.withoutParagraphMark(raw),
           isOldFont: fontCheck.isOldFont,
           fontName,
           locationType: 'body'
@@ -141,6 +153,89 @@ export class WordService {
         oldFontCount,
         totalParagraphs: resultParagraphs.length
       };
+    });
+  }
+
+  /**
+   * Đổi các đoạn dùng bảng mã cũ sang Unicode, làm theo từng từ để giữ đậm, nghiêng, cỡ chữ.
+   * Bỏ qua đoạn có sửa đổi theo dõi và từ lẫn nhiều font vì không chắc đổi đúng.
+   */
+  public static async convertOldFonts(): Promise<OldFontConvertResult> {
+    const result: OldFontConvertResult = { paragraphs: 0, words: 0, skippedTracked: 0, skippedMixed: 0 };
+    if (!this.isWordAvailable()) return result;
+    if (!this.checkSupport().is1_3) {
+      throw new Error('Phiên bản Word này chưa hỗ trợ đổi bảng mã.');
+    }
+
+    return await window.Word.run(async (context) => {
+      const paragraphs = context.document.body.paragraphs;
+      paragraphs.load(['text', 'font/name']);
+      await context.sync();
+
+      const reviewed = this.loadReviewedText(paragraphs.items);
+      await context.sync();
+
+      const targets: Word.Paragraph[] = [];
+      paragraphs.items.forEach((paragraph, i) => {
+        if (!paragraph.text.trim()) return;
+        const text = reviewed ? this.withoutParagraphMark(reviewed[i].value) : paragraph.text;
+        const fontName = paragraph.font?.name;
+        const isOld = detectOldFont(fontName, text).isOldFont;
+        if (text !== this.withoutParagraphMark(paragraph.text)) {
+          if (isOld) result.skippedTracked++;
+          return;
+        }
+        // Font trống là đoạn lẫn nhiều font: phải xem từng từ mới biết
+        if (isOld || !fontName) targets.push(paragraph);
+      });
+
+      for (let start = 0; start < targets.length; start += CONVERT_BATCH_SIZE) {
+        const batch = targets.slice(start, start + CONVERT_BATCH_SIZE);
+        const wordLists = batch.map(paragraph => paragraph.getTextRanges([' '], false));
+        wordLists.forEach(list => list.load(['items/text', 'items/font/name']));
+        await context.sync();
+
+        batch.forEach((paragraph, i) => {
+          const words = wordLists[i].items;
+          const hasLegacyName = words.some(word => isLegacyFontName(word.font.name));
+          let changed = false;
+
+          words.forEach((word, position) => {
+            const fontName = word.font.name;
+            if (!fontName) {
+              result.skippedMixed++;
+              return;
+            }
+            const legacyName = isLegacyFontName(fontName);
+            // Đoạn đã có font cũ thì từ mang font thường là chữ Unicode, không đổi
+            if (hasLegacyName && !legacyName) return;
+
+            const encoding = detectLegacyEncoding(fontName, paragraph.text);
+            if (!encoding) return;
+
+            // Chỉ từ cuối đoạn mới có dấu cuối, và chỉ khi paragraph.text không chứa nó
+            const hasMark = position === words.length - 1 && !paragraph.text.endsWith(word.text);
+            const plain = hasMark ? word.text.replace(PARAGRAPH_MARK, '') : word.text;
+            const converted = convertLegacyText(plain, encoding, fontName);
+            const textChanged = converted !== plain;
+            let target: Word.Range = word;
+            if (textChanged) {
+              // Từ cuối đoạn nằm cả dấu xuống đoạn: thay nguyên range sẽ đẻ thêm đoạn trống
+              const content = hasMark ? word.intersectWith(paragraph.getRange('Content')) : word;
+              target = content.insertText(converted, window.Word.InsertLocation.replace);
+            }
+            if (legacyName || textChanged) {
+              target.font.name = unicodeFontFor(fontName);
+              changed = true;
+              result.words++;
+            }
+          });
+          if (changed) result.paragraphs++;
+        });
+        await context.sync();
+      }
+
+      return result;
     });
   }
 
@@ -160,12 +255,12 @@ export class WordService {
       await context.sync();
 
       const raw = paragraph.text;
-      const text = reviewed ? reviewed[0].value : raw;
+      const text = reviewed ? this.withoutParagraphMark(reviewed[0].value) : raw;
       const fontName = paragraph.font?.name;
       return {
         index: paragraphIndex,
         text,
-        hasTrackedChanges: text !== raw,
+        hasTrackedChanges: text !== this.withoutParagraphMark(raw),
         isOldFont: detectOldFont(fontName, text).isOldFont,
         fontName,
         locationType: 'body'
@@ -250,6 +345,11 @@ export class WordService {
     return result;
   }
 
+  /** getReviewedText trên Word thật kèm dấu cuối đoạn, còn paragraph.text thì không */
+  private static withoutParagraphMark(text: string): string {
+    return text.replace(PARAGRAPH_MARK, '');
+  }
+
   /** getReviewedText thuộc WordApi 1.4; bản cũ hơn thì dùng text thô */
   private static loadReviewedText(paragraphs: Word.Paragraph[]): OfficeExtension.ClientResult<string>[] | null {
     if (!this.checkSupport().is1_4) return null;
@@ -275,7 +375,7 @@ export class WordService {
     await context.sync();
 
     const raw = paragraph.text;
-    const current = reviewed ? reviewed[0].value : raw;
+    const current = reviewed ? this.withoutParagraphMark(reviewed[0].value) : raw;
     if (current !== expectedText) return 'stale';
     if (current.slice(error.batDau, error.ketThuc) !== error.goc) return 'stale';
 
@@ -289,7 +389,7 @@ export class WordService {
 
     // Chữ đã xóa theo dõi vẫn nằm trong đoạn nên Word có thể tìm ra nhiều hơn số lần hiển thị
     if (results.items.length !== occurrences.length) {
-      return raw !== current ? 'tracked' : 'not-found';
+      return this.withoutParagraphMark(raw) !== current ? 'tracked' : 'not-found';
     }
 
     const target = results.items[position];
