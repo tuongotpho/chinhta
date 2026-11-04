@@ -3,15 +3,13 @@ import {
   makeStyles,
   shorthands,
   tokens,
-  Card,
-  CardHeader,
   Badge,
   Button,
   Text,
-  RadioGroup,
-  Radio
+  ToggleButton
 } from '@fluentui/react-components';
 import {
+  ArrowRightRegular,
   EyeRegular,
   CheckmarkRegular,
   DismissRegular,
@@ -22,38 +20,80 @@ import { Severity } from '../../engine/types';
 
 const useStyles = makeStyles({
   card: {
-    ...shorthands.margin('8px', '0'),
-    boxShadow: tokens.shadow2,
+    display: 'flex',
+    flexDirection: 'column',
+    ...shorthands.gap('3px'),
+    ...shorthands.margin('0', '0', '6px'),
+    ...shorthands.padding('6px', '8px'),
+    backgroundColor: tokens.colorNeutralBackground1,
+    ...shorthands.borderRadius(tokens.borderRadiusMedium),
     ...shorthands.border('1px', 'solid', tokens.colorNeutralStroke2)
   },
   header: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    width: '100%'
+    ...shorthands.gap('6px')
+  },
+  fixLine: {
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    columnGap: '4px',
+    minWidth: 0,
+    fontSize: '13px',
+    lineHeight: '18px',
+    wordBreak: 'break-word'
   },
   originalWord: {
-    fontWeight: 'bold',
+    fontWeight: 600,
     textDecorationLine: 'line-through',
     color: tokens.colorPaletteRedForeground1
   },
-  reasonText: {
-    fontSize: '12px',
-    color: tokens.colorNeutralForeground3,
-    ...shorthands.margin('4px', '0')
+  arrow: {
+    flexShrink: 0,
+    color: tokens.colorNeutralForeground3
   },
-  suggestionsSection: {
+  suggestion: {
+    fontWeight: 600,
+    color: tokens.colorPaletteGreenForeground1
+  },
+  badge: {
+    flexShrink: 0
+  },
+  reasonText: {
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    ...shorthands.overflow('hidden'),
+    fontSize: '11px',
+    lineHeight: '14px',
+    color: tokens.colorNeutralForeground3
+  },
+  suggestions: {
     display: 'flex',
-    flexDirection: 'column',
-    ...shorthands.gap('4px'),
-    ...shorthands.margin('8px', '0')
+    flexWrap: 'wrap',
+    ...shorthands.gap('3px')
+  },
+  suggestionBtn: {
+    minWidth: 0,
+    height: '22px',
+    ...shorthands.padding('0', '6px'),
+    fontSize: '12px',
+    fontWeight: 400
   },
   actionRow: {
     display: 'flex',
-    ...shorthands.gap('6px'),
-    paddingTop: '8px',
-    ...shorthands.borderTop('1px', 'solid', tokens.colorNeutralStroke3),
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    ...shorthands.gap('2px'),
+    marginTop: '1px'
+  },
+  actionBtn: {
+    minWidth: 0,
+    height: '24px',
+    ...shorthands.padding('0', '6px'),
+    fontSize: '12px',
+    fontWeight: 400
   }
 });
 
@@ -83,41 +123,54 @@ export const ErrorCard: React.FC<ErrorCardProps> = ({
   const styles = useStyles();
   const { error, selectedSuggestion } = item;
   const config = SEVERITY_CONFIG[error.mucDo] || { label: 'Lỗi', color: 'danger' };
+  const hasSuggestion = error.goiY.length > 0;
 
   return (
-    <Card className={styles.card}>
-      <CardHeader
-        header={
-          <div className={styles.header}>
-            <Text weight="semibold" className={styles.originalWord}>
-              {error.goc}
-            </Text>
-            <Badge appearance="filled" color={config.color} size="small">
-              {config.label} ({error.luat})
-            </Badge>
-          </div>
-        }
-      />
+    <div className={styles.card}>
+      <div className={styles.header}>
+        <div className={styles.fixLine}>
+          <span className={styles.originalWord}>{error.goc}</span>
+          {hasSuggestion && (
+            <>
+              <ArrowRightRegular className={styles.arrow} />
+              <span className={styles.suggestion}>{selectedSuggestion}</span>
+            </>
+          )}
+        </div>
+        <Badge
+          className={styles.badge}
+          appearance="filled"
+          color={config.color}
+          size="small"
+          title={`Luật ${error.luat}`}
+        >
+          {config.label}
+        </Badge>
+      </div>
 
-      <Text className={styles.reasonText}>{error.lyDo}</Text>
+      <Text className={styles.reasonText} title={error.lyDo}>{error.lyDo}</Text>
 
-      {error.goiY && error.goiY.length > 0 && (
-        <div className={styles.suggestionsSection}>
-          <Text size={200} weight="semibold">Gợi ý sửa:</Text>
-          <RadioGroup
-            value={selectedSuggestion}
-            onChange={(_, data) => onUpdateSuggestion(data.value)}
-          >
-            {error.goiY.map((sug, idx) => (
-              <Radio key={idx} value={sug} label={sug} />
-            ))}
-          </RadioGroup>
+      {error.goiY.length > 1 && (
+        <div className={styles.suggestions} role="group" aria-label="Chọn gợi ý sửa">
+          {error.goiY.map(sug => (
+            <ToggleButton
+              key={sug}
+              className={styles.suggestionBtn}
+              size="small"
+              appearance="outline"
+              checked={sug === selectedSuggestion}
+              onClick={() => onUpdateSuggestion(sug)}
+            >
+              {sug}
+            </ToggleButton>
+          ))}
         </div>
       )}
 
       <div className={styles.actionRow}>
-        {error.goiY.length > 0 && (
+        {hasSuggestion && (
           <Button
+            className={styles.actionBtn}
             size="small"
             appearance="primary"
             icon={<CheckmarkRegular />}
@@ -128,15 +181,18 @@ export const ErrorCard: React.FC<ErrorCardProps> = ({
         )}
 
         <Button
+          className={styles.actionBtn}
           size="small"
-          appearance="secondary"
+          appearance="subtle"
           icon={<EyeRegular />}
+          title="Xem chỗ này trong văn bản"
           onClick={onSelect}
         >
           Xem
         </Button>
 
         <Button
+          className={styles.actionBtn}
           size="small"
           appearance="subtle"
           icon={<DismissRegular />}
@@ -146,14 +202,16 @@ export const ErrorCard: React.FC<ErrorCardProps> = ({
         </Button>
 
         <Button
+          className={styles.actionBtn}
           size="small"
           appearance="subtle"
           icon={<BookmarkAddRegular />}
+          title="Lưu vào từ điển của tôi"
           onClick={() => onAddToDict(error.goc)}
         >
-          Lưu từ điển
+          Lưu
         </Button>
       </div>
-    </Card>
+    </div>
   );
 };
