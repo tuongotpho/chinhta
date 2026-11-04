@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "validate-manifest": "office-addin-manifest validate manifest.xml",
-    "do-chinh-ta": "tsx scripts/do-chinh-ta.ts"
+    "do-chinh-ta": "tsx scripts/do-chinh-ta.ts",
+    "dong-goi": "powershell -ExecutionPolicy Bypass -File scripts/dong-goi.ps1"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.57.0",

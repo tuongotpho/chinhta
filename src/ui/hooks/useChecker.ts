@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { WordService } from '../../word/wordService';
+import { isLegacyFontName } from '../../word/legacyEncoding';
 import { checkParagraphsWithWorker } from '../../engine/workerClient';
 import { prepareEngine } from '../loadModel';
 import { SpellError, CheckOptions } from '../../engine/types';
@@ -72,8 +73,9 @@ export function useChecker(userDictionary: string[]) {
       await prepareEngine();
       const scanResult = await WordService.readDocument(scope);
       if (scanResult.hasOldFontWarning) {
+        const fonts = [...new Set(scanResult.paragraphs.filter(p => p.isOldFont && isLegacyFontName(p.fontName)).map(p => p.fontName))];
         setOldFontWarning(
-          `Phát hiện ${scanResult.oldFontCount} đoạn văn bản sử dụng font chữ hoặc bảng mã cũ (TCVN3 / .VnTime hoặc VNI). Các đoạn này đã được tự động bỏ qua để tránh báo lỗi ảo.`
+          `Phát hiện ${scanResult.oldFontCount} đoạn dùng font hoặc bảng mã cũ${fonts.length ? ` (${fonts.join(', ')})` : ' (TCVN3 hoặc VNI)'}. Các đoạn này chưa được soát lỗi. Hãy đổi sang Unicode rồi quét lại.`
         );
       }
 
@@ -187,6 +189,25 @@ export function useChecker(userDictionary: string[]) {
     }
   };
 
+  /** Đổi bảng mã cũ sang Unicode rồi quét lại, vì mọi vị trí lỗi cũ không còn đúng */
+  const convertOldFonts = async (): Promise<void> => {
+    setNotice(null);
+    try {
+      const result = await WordService.convertOldFonts();
+      await scan('all');
+      const skipped = [
+        result.skippedTracked ? `${result.skippedTracked} đoạn có sửa đổi theo dõi` : '',
+        result.skippedMixed ? `${result.skippedMixed} từ lẫn nhiều font` : ''
+      ].filter(Boolean).join(', ');
+      setNotice({
+        intent: skipped ? 'warning' : 'success',
+        text: `Đã đổi ${result.paragraphs} đoạn (${result.words} từ) sang Unicode${skipped ? `, bỏ qua ${skipped}` : ''}. Hãy đọc lại văn bản trước khi lưu.`
+      });
+    } catch (e) {
+      setNotice({ intent: 'error', text: `Đổi bảng mã bị gián đoạn: ${(e as Error).message ?? e}. Bấm Ctrl+Z để hoàn tác rồi thử lại.` });
+    }
+  };
+
   const updateSuggestion = (itemId: string, suggestion: string) => {
     setItems(prev =>
       prev.map(i => (i.id === itemId ? { ...i, selectedSuggestion: suggestion } : i))
@@ -207,6 +228,7 @@ export function useChecker(userDictionary: string[]) {
     ignoreError,
     dropWord,
     batchFixSure,
+    convertOldFonts,
     updateSuggestion
   };
 }

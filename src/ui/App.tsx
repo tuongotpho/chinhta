@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { ScanControls } from './components/ScanControls';
 import { ErrorList } from './components/ErrorList';
 import { BatchFixModal } from './components/BatchFixModal';
+import { OldFontModal } from './components/OldFontModal';
 import { UserDictionaryModal } from './components/UserDictionaryModal';
 import { AboutModal } from './components/AboutModal';
 import { Footer } from './components/Footer';
@@ -33,6 +34,7 @@ export const App: React.FC = () => {
     ignoreError,
     dropWord,
     batchFixSure,
+    convertOldFonts,
     updateSuggestion
   } = useChecker(dictWords);
 
@@ -40,6 +42,8 @@ export const App: React.FC = () => {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isBatchOpen, setIsBatchOpen] = useState(false);
   const [isFixingBatch, setIsFixingBatch] = useState(false);
+  const [isConvertOpen, setIsConvertOpen] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
 
   const sureItems = items.filter(isBatchEligible);
 
@@ -50,6 +54,16 @@ export const App: React.FC = () => {
       setIsBatchOpen(false);
     } finally {
       setIsFixingBatch(false);
+    }
+  };
+
+  const handleConfirmConvert = async () => {
+    setIsConverting(true);
+    try {
+      await convertOldFonts();
+      setIsConvertOpen(false);
+    } finally {
+      setIsConverting(false);
     }
   };
 
@@ -67,6 +81,7 @@ export const App: React.FC = () => {
           onScanAll={() => scan('all')}
           onScanSelection={() => scan('selection')}
           onOpenBatchModal={() => setIsBatchOpen(true)}
+          onOpenConvertModal={() => setIsConvertOpen(true)}
           sureCount={sureItems.length}
           oldFontWarning={oldFontWarning}
           notice={notice}
@@ -95,6 +110,13 @@ export const App: React.FC = () => {
           count={sureItems.length}
           onConfirm={handleConfirmBatch}
           isFixing={isFixingBatch}
+        />
+
+        <OldFontModal
+          open={isConvertOpen}
+          onOpenChange={setIsConvertOpen}
+          onConfirm={handleConfirmConvert}
+          isConverting={isConverting}
         />
 
         <UserDictionaryModal

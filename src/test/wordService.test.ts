@@ -22,7 +22,7 @@ class FakeParagraph {
     this.reviewed = deleted ? text.replace(deleted, '') : text;
   }
   load() {}
-  getReviewedText() { return { value: this.reviewed }; }
+  getReviewedText() { return { value: this.reviewed + '\t' }; }
   getRange() { return { compareLocationWith: () => ({ value: this.relation }) }; }
   search(word: string) {
     const items: FakeRange[] = [];
@@ -62,6 +62,45 @@ describe('WordService', () => {
     install(paragraphs);
     const result = await WordService.readDocument('selection');
     expect(result.paragraphs.map(p => p.index)).toEqual([1, 2, 3, 4]);
+  });
+
+  it('Word dưới WordApi 1.3: quét vùng chọn báo rõ, quét toàn bộ vẫn chạy', async () => {
+    install([new FakeParagraph('Đoạn 0')]);
+    window.Office.context.requirements.isSetSupported = () => false;
+    await expect(WordService.readDocument('selection')).rejects.toThrow('Quét toàn bộ');
+    const result = await WordService.readDocument('all');
+    expect(result.paragraphs).toHaveLength(1);
+  });
+
+  it('đổi bảng mã cũ theo từng từ, giữ từ Unicode và bỏ qua đoạn có sửa đổi theo dõi', async () => {
+    const word = (text: string, name: string) => {
+      const item = {
+        text,
+        font: { name },
+        intersectWith: () => {
+          item.intersected = true;
+          return item;
+        },
+        intersected: false,
+        insertText(value: string) { item.text = value; return item; }
+      };
+      return item;
+    };
+    const old = new FakeParagraph('C«ng ty Việt lùc');
+    (old.font as { name: string }).name = '';
+    const words = [word('C«ng ', '.VnTime'), word('ty ', '.VnTime'), word('Việt ', 'Times New Roman'), word('lùc\r', '.VnTime')];
+    Object.assign(old, { getTextRanges: () => ({ load() {}, items: words }) });
+    const tracked = new FakeParagraph('C«ng ty cũ', 'cũ');
+    tracked.font.name = '.VnTime';
+    const clean = new FakeParagraph('Công ty');
+    install([old, tracked, clean]);
+
+    const result = await WordService.convertOldFonts();
+
+    expect(words.map(w => w.text).join('')).toBe('Công ty Việt lực');
+    expect(words[3].intersected).toBe(true);
+    expect(words.every(w => w.font.name === 'Times New Roman')).toBe(true);
+    expect(result).toEqual({ paragraphs: 1, words: 3, skippedTracked: 1, skippedMixed: 0 });
   });
 
   it('sửa đúng lần xuất hiện được yêu cầu', async () => {

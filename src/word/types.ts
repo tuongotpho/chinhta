@@ -40,3 +40,14 @@ export interface BatchResult {
   succeeded: string[];
   failed: string[];
 }
+
+export interface OldFontConvertResult {
+  /** Số đoạn đã đổi */
+  paragraphs: number;
+  /** Số từ đã đổi */
+  words: number;
+  /** Số đoạn bỏ qua vì đang có sửa đổi theo dõi */
+  skippedTracked: number;
+  /** Số từ bỏ qua vì lẫn nhiều font trong một từ */
+  skippedMixed: number;
+}

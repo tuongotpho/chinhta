@@ -1,0 +1,19 @@
+ADD-IN SOÁT CHÍNH TẢ CHO WORD
+
+CÀI ĐẶT (mỗi người làm 1 lần)
+1. Lưu tài liệu, đóng hết Word.
+2. Mở thư mục này trên ổ mạng, bấm đúp tệp CAI-SOAT-CHINH-TA.cmd
+3. Nếu Windows hiện cảnh báo: bấm "More info" rồi "Run anyway".
+4. Mở Word, tab Home, bấm nút Add-ins, chọn dòng cuối bảng (More Add-ins hoặc Get Add-ins).
+5. Chọn mục SHARED FOLDER, bấm vào Soát Chính Tả, bấm Add.
+Từ đó tab "Chính Tả" luôn có trong Word.
+
+Nút Add mờ là do chưa bấm chọn Soát Chính Tả.
+
+GỠ CÀI ĐẶT
+Bấm đúp tệp GO-SOAT-CHINH-TA.cmd
+
+LƯU Ý
+Máy cần có mạng khi mở add-in. Văn bản không gửi đi đâu, việc soát lỗi chạy ngay trên máy.
+
+Hỗ trợ: (C) August87 - 0982722036

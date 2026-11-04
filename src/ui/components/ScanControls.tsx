@@ -7,7 +7,8 @@ import {
   Spinner,
   Checkbox,
   MessageBar,
-  MessageBarBody
+  MessageBarBody,
+  MessageBarActions
 } from '@fluentui/react-components';
 import {
   DocumentSearchRegular,
@@ -46,6 +47,7 @@ interface ScanControlsProps {
   onScanAll: () => void;
   onScanSelection: () => void;
   onOpenBatchModal: () => void;
+  onOpenConvertModal: () => void;
   sureCount: number;
   oldFontWarning: string | null;
   notice: Notice | null;
@@ -59,6 +61,7 @@ export const ScanControls: React.FC<ScanControlsProps> = ({
   onScanAll,
   onScanSelection,
   onOpenBatchModal,
+  onOpenConvertModal,
   sureCount,
   oldFontWarning,
   notice,
@@ -73,6 +76,9 @@ export const ScanControls: React.FC<ScanControlsProps> = ({
       {oldFontWarning && (
         <MessageBar intent="warning">
           <MessageBarBody>{oldFontWarning}</MessageBarBody>
+          <MessageBarActions>
+            <Button size="small" disabled={isScanning} onClick={onOpenConvertModal}>Đổi sang Unicode</Button>
+          </MessageBarActions>
         </MessageBar>
       )}
 

@@ -58,6 +58,21 @@ Xoá thư mục: `rmdir /s /q "%USERPROFILE%\SoatChinhTa"`
 
 ---
 
+## 3b. Số Đo Thực Tế Ngày 04/11/2026 (Word 16.0.20527.20112, Microsoft 365 Personal/Family bản Retail)
+
+| Phép đo | Kết quả |
+| :--- | :--- |
+| Chạy `CAI-SOAT-CHINH-TA.cmd` từ gói zip | Đạt: có khóa registry, có tệp manifest |
+| Chạy tệp cài khi thiếu `manifest.xml` | Đạt: báo lỗi, không ghi registry |
+| Mở Word trống sau khi đăng ký | **Không có tab Chính Tả** |
+| Mở `Mo-Soat-Chinh-Ta.docx` (tệp gắn sẵn add-in) | Đạt: có tab, bảng soát lỗi tải đủ |
+| Quét văn bản có 4 lỗi cố ý | Đạt: bắt 4/4, mạng chỉ tải 2 tệp của add-in |
+| Đóng tệp gắn add-in | Word hỏi có lưu không, dù người dùng chưa sửa gì |
+| Mục Developer Add-ins trong Word | Không có, hộp thoại chỉ có MY ADD-INS và STORE |
+| Thêm Thư mục tin cậy `\\localhost\C$\...`, tích Show in Menu, Add từ SHARED FOLDER, đóng rồi mở Word trống | **Đạt: tab còn, chạy được** (chủ dự án tự thao tác và xác nhận) |
+
+Vì vậy các mục 2 và 3 (đường T qua `Wef\Developer`) đã bị thay. Bộ cài hiện dùng Thư mục tin cậy.
+
 ## 4. Biên Bản Kiểm Thử Trên Các Phiên Bản Word
 
 > Bảng dưới đây chưa có ảnh chụp hay số phiên bản được xác minh, cần coi là chưa kiểm chứng cho đến khi thử lại trên máy thật.
