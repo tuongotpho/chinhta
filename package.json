@@ -1,6 +1,6 @@
 {
   "name": "soat-chinh-ta-word-addin",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Add-in Word soát lỗi chính tả tiếng Việt nội bộ (không AI) bảo vệ dữ liệu văn bản",
   "private": true,
   "license": "GPL-3.0-or-later",
